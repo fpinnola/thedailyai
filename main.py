@@ -1,8 +1,15 @@
+import os
+
 from dotenv import load_dotenv
+from openai import OpenAI
+from eventregistry import *
+
+
+# Load environment variables from .env
 load_dotenv()
 
-from openai import OpenAI
-
+NEWS_API_KEY = os.getenv('NEWS_API_KEY')
+er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
 client = OpenAI()
 
 THEMES =["business", "technology", "politics", "biotech"]
@@ -22,14 +29,44 @@ SAMPLE_DATA = [
         theme: string, must be in THEMES
         n: max articles to return (default 5)
 '''
-def get_latest_articles(theme, n=5):
+def get_latest_articles(theme, n=1):
     if not theme in THEMES:
         raise Exception(f"{theme} not a valid theme")
     
-    # TODO: pull articles from web => Summarize
 
-    return SAMPLE_DATA
+    # Pull articles from news api
+    q = QueryArticlesIter(
+        categoryUri = er.getCategoryUri(f"news {theme}"),
+        lang='eng'
+    )
+    articles = []
+    for art in q.execQuery(er, sortBy = "date", maxItems=n):
+        articles.append({
+            'uri': art['uri'],
+            'title': art['title'],
+            'body': art['body']
+        })
 
+    # Use GPT to summarize article's body
+    for i in range(len(articles)):
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": f"Summarize the following article in the style of a news broadcast. Retain important facts and key ideas presented. Only provide your summary and no extra message."},
+                {"role": "user", "content": f"{raw_data[i]['body']}"}
+            ]
+        )
+        articles[i]['summary'] = completion.choices[0].message.content
+
+    return articles
+
+
+'''
+    Returns a finalized script for a news broadcast given a set of articles
+    Params:
+        articles: list of articles objects that have 'title' and 'summary' fields
+        style: string, should be in the STYLES list
+'''
 def generate_script(articles, style="newscaster"):
     if not len(articles):
         raise Exception("No articles passed")
@@ -46,13 +83,11 @@ def generate_script(articles, style="newscaster"):
         ]
     )
 
-    print(completion)
-
-
 
 
 
 if __name__ == "__main__":
     articles = get_latest_articles("technology")
-    generate_script(articles)
+    script = generate_script(articles)
+    print(script)
 
