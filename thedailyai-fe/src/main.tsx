@@ -4,15 +4,20 @@ import App from './App.tsx'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Onboard from './Onboard.tsx'
+import Home from './Home.tsx'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '',
     element: <App />
   },
   {
-    path: "/onboard",
+    path: '/onboard',
     element: <Onboard />
+  },
+  {
+    path: '/home',
+    element: <Home />
   }
 ])
 
