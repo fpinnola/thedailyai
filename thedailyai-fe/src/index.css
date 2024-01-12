@@ -43,17 +43,18 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #dfe87a;
+  color: white;
+  background-color: #79B464;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 
 .unselected {
-  background-color: #898a7e;
+  background-color: #717171;
 }
 
 .selected {
-  background-color: #71cf79;
+  background-color: #E49F6D;
 }
 
 /* button:hover {
