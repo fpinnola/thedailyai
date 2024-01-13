@@ -83,6 +83,9 @@ def generate_script(articles, style="newscaster"):
         ]
     )
 
+def get_news_from_params(params):
+    return SAMPLE_DATA
+
 
 
 
