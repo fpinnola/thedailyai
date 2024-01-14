@@ -23,6 +23,32 @@ SAMPLE_DATA = [
     { 'title': 'Global Internet to Shut Down for Maintenance', 'url': 'https://example.com/global-internet-shutdown', 'summary': 'Authorities announce a scheduled global internet shutdown for system upgrades.' }
 ]
 
+def get_articles_from_api(categories, n=10):
+
+    ri = ReturnInfo(ArticleInfoFlags(categories=True))
+
+    q = QueryArticlesIter(
+        categoryUri= QueryItems.OR([f"{er.getCategoryUri(cat)}" for cat in categories]),
+        lang='eng',
+        startSourceRankPercentile=0,
+        endSourceRankPercentile=10,
+        dataType="news"
+    )
+
+    articles = []
+    for art in q.execQuery(er, sortBy = "date", maxItems=n, returnInfo=ri):
+        articles.append({
+            'title': art['title'],
+            'body': art['body'],
+            'uri': art['uri'],
+            'meta': {k: v for k, v in art.items() if k not in ['body', 'title', 'url']}
+        })
+    
+    print(f"articles: {articles}")
+
+    return articles
+
+
 '''
     Returns n latest articles given a theme
     Params:
@@ -36,7 +62,7 @@ def get_latest_articles(theme, n=1):
 
     # Pull articles from news api
     q = QueryArticlesIter(
-        categoryUri = er.getCategoryUri(f"news {theme}"),
+        categoryUri = er.getCategoryUri(f"{theme}"),
         lang='eng'
     )
     articles = []
@@ -83,8 +109,26 @@ def generate_script(articles, style="newscaster"):
         ]
     )
 
-def get_news_from_params(params):
-    return SAMPLE_DATA
+
+
+def get_news_from_params(params, n=10):
+
+    print(f"params: {params['categories']}")
+
+    articles = []
+
+    # TODO: check DB for articles
+
+    # Query API for missing articles
+    n = n - len(articles)
+    articles.append(get_articles_from_api(params['categories'], n))
+    # Generate summaries for articles
+
+
+    # TODO: Store articles in DB
+
+
+    return articles
 
 
 
