@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getNews } from "./external/news_be.external";
 
 const SAMPLE_ARTICLES = [
     { title: 'Flying Cars to Become Mainstream by 2025', url: 'https://example.com/flying-cars-2025', summary: 'Industry experts predict flying cars will dominate city skies in the next year.' },
@@ -18,8 +19,17 @@ export default function Home() {
 
     useEffect(() => {
         // TODO: get articles from backend
-        setArticles(SAMPLE_ARTICLES);
-        setPodcastScript(SAMPLE_BROADCAST);
+        const wrapper = async () => {
+            let prefString = localStorage.getItem('preferences');
+            if (!prefString) return;
+            const preferences = JSON.parse(prefString)
+            let news: any[] = await getNews(preferences);
+            setArticles(news);
+            setPodcastScript(SAMPLE_BROADCAST);
+        }
+
+        wrapper();
+
     }, []);
 
     const getDate = () => {
