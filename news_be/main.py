@@ -114,10 +114,12 @@ def generate_script(articles, style="newscaster"):
 def get_news_from_params(params, n=10):
 
     print(f"params: {params['categories']}")
+    print(f"userId: {params['userId']}")
 
     articles = []
 
     # TODO: check DB for articles
+    
 
     # Query API for missing articles
     n = n - len(articles)
