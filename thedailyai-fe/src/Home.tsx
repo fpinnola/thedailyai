@@ -11,6 +11,8 @@ const SAMPLE_ARTICLES = [
 
 const SAMPLE_BROADCAST = "Good evening, tech enthusiasts! You're listening to the Daily Tech Update with me, Jordan Lee. Let's get right into today's most exciting tech news. First up, big news from the tech world: FutureTech just unveiled its latest marvel, the FuturePhone X5. This new smartphone is a tech-lover's dream, featuring an AI-powered camera and a stunning transparent OLED display. But that's not all – the battery life is a game changer, promising days of use on a single charge. At the launch event earlier today, the buzz was all about these groundbreaking features, especially that AI camera which adapts to any lighting for the perfect shot. Now, let's switch gears to virtual reality. VirtualTech has introduced the DreamScape VR headset, and let me tell you, it's a breakthrough in immersive technology. I had the chance to try it out, and it's like stepping into a completely different world. It’s wireless, with no external sensors, offering a level of immersion that's simply unprecedented. This could really shake things up in the entertainment world. In cybersecurity news, there’s a serious development to talk about. Hackbots, a major player in security software, reported a significant data breach. This breach has compromised the personal data of millions. They’re ramping up security measures and working with law enforcement to get to the bottom of this. For all of us, it's a reminder to stay vigilant – update those passwords and enable two-factor authentication wherever possible. Finally, in a blend of tech and art, an AI-powered robot named Arti has been creating waves in the art world. Arti’s paintings, which merge traditional techniques with AI algorithms, are challenging our very notions of art and creativity. These pieces are set to be exhibited in New York next month, and they're already sparking a lot of conversations about the role of AI in art. That's all for today's Daily Tech Update. Tune in tomorrow for more of the latest and greatest in the world of technology. This is Jordan Lee, signing off. Have a tech-tastic evening!";
 
+const USER_ID_TEST = 'frank123';
+
 export default function Home() {
 
     const [articles, setArticles] = useState<any[]>([]);
@@ -23,6 +25,7 @@ export default function Home() {
             let prefString = localStorage.getItem('preferences');
             if (!prefString) return;
             const preferences = JSON.parse(prefString)
+            preferences.userId = USER_ID_TEST;
             let news: any[] = await getNews(preferences);
             setArticles(news);
             setPodcastScript(SAMPLE_BROADCAST);
