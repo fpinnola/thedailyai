@@ -26,6 +26,10 @@ SAMPLE_DATA = [
 ]
 
 def get_articles_from_api(categories, n=10):
+    print(f"Requesting {n} articles from external API")
+    if not n:
+        # Requesting 0 articles
+        return []
 
     ri = ReturnInfo(ArticleInfoFlags(categories=True))
 
@@ -128,7 +132,13 @@ def get_news_from_params(params, n=10):
     articles = []
 
     # TODO: check DB for articles
-    articles.extend(users.get_user_articles(userId))
+    user_artices = users.get_user_articles(userId)
+    if not user_artices:
+        # User doesn't exist, create
+        users.save_user_preferences(userId, {})
+        user_artices = []
+
+    articles.extend(user_artices)
 
     # Query API for missing articles
     n = n - len(articles)
