@@ -1,5 +1,12 @@
-import datetime
+from datetime import datetime
 from pymongo import MongoClient
+
+def is_same_day_as_today(date_to_check):
+    # Get today's date
+    today = datetime.now().date()
+
+    # Compare only the date part of the datetime object
+    return date_to_check.date() == today
 
 class UserModel:
     def __init__(self) -> None:
@@ -8,11 +15,11 @@ class UserModel:
         self.users = self.db.user_collection
         
 
-
     def get_user(self, userId):
         user = self.users.find_one({'userId': userId})
         if not user:
             print(f"User {userId} not found")
+            return None
         return user
 
     def save_user_preferences(self, userId, preferences):
@@ -24,13 +31,36 @@ class UserModel:
 
         return new_user
 
-    # TODO: implement
     def update_user_articles(self, userId, articles):
-        pass
+        new_user = self.users.update_one({
+            'userId': userId
+        }, {
+            '$set': { 
+                'articles': articles,
+                'articlesDate': datetime.now()
+             }
+        })
+        return new_user
 
-    # TODO: implement
     def get_user_articles(self, userId):
-        pass
+        user = self.get_user(userId)
+
+        # User does not exist
+        if not user:
+            return None
+        
+        # No articles stored
+        if not user['articles'] or not user['articlesDate']:
+            return []
+        
+        # Articles don't match current day
+        if not is_same_day_as_today(user['articlesDate']):
+            return []
+        
+        return user['articles']
+        
+        
+
 
 if __name__ == '__main__':
     users = UserModel()
@@ -44,3 +74,8 @@ if __name__ == '__main__':
     users.save_user_preferences('abc123', preferences)
 
     print(users.get_user('abc123'))
+
+    articles = ['abc123', 'article2!']
+    users.update_user_articles('abc123', articles)
+
+    print(users.get_user_articles('abc123'))

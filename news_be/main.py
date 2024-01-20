@@ -113,17 +113,23 @@ def generate_script(articles, style="newscaster"):
 
 def get_news_from_params(params, n=10):
 
+    categories = params['categories']
+    userId = params['userId']
+
+    if not categories or not userId:
+        print("Error getting params from get news request")
+        return []
+
     print(f"params: {params['categories']}")
     print(f"userId: {params['userId']}")
 
     articles = []
 
     # TODO: check DB for articles
-    
 
     # Query API for missing articles
     n = n - len(articles)
-    articles.extend(get_articles_from_api(params['categories'], n))
+    articles.extend(get_articles_from_api(categories, n))
     # Generate summaries for articles
 
 
