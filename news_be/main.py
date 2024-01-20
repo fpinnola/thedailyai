@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from eventregistry import *
+from user_model import UserModel
 
 
 # Load environment variables from .env
@@ -11,6 +12,7 @@ load_dotenv()
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
 client = OpenAI()
+users = UserModel()
 
 THEMES =["business", "technology", "politics", "biotech"]
 STYLES = ["newscaseter", "humorous", "serious"]
@@ -126,18 +128,17 @@ def get_news_from_params(params, n=10):
     articles = []
 
     # TODO: check DB for articles
+    articles.extend(users.get_user_articles(userId))
 
     # Query API for missing articles
     n = n - len(articles)
     articles.extend(get_articles_from_api(categories, n))
     # Generate summaries for articles
 
-
     # TODO: Store articles in DB
-
+    users.update_user_articles(userId, articles)
 
     return articles
-
 
 
 
