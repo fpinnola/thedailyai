@@ -5,6 +5,8 @@ from openai import OpenAI
 from eventregistry import *
 from user_model import UserModel
 import concurrent.futures
+from gtts import gTTS
+import os
 
 
 # Load environment variables from .env
@@ -26,6 +28,13 @@ SAMPLE_DATA = [
     { 'title': 'Global Internet to Shut Down for Maintenance', 'url': 'https://example.com/global-internet-shutdown', 'summary': 'Authorities announce a scheduled global internet shutdown for system upgrades.' }
 ]
 
+
+'''
+    Returns n latest articles given categories
+    Params:
+        categories: list of strings
+        n: max articles to return (default 5)
+'''
 def get_articles_from_api(categories, n=10):
     print(f"Requesting {n} articles from external API")
     if not n:
@@ -53,44 +62,6 @@ def get_articles_from_api(categories, n=10):
     
     return articles
 
-
-'''
-    Returns n latest articles given a theme
-    Params:
-        theme: string, must be in THEMES
-        n: max articles to return (default 5)
-'''
-def get_latest_articles(theme, n=1):
-    if not theme in THEMES:
-        raise Exception(f"{theme} not a valid theme")
-    
-
-    # Pull articles from news api
-    q = QueryArticlesIter(
-        categoryUri = er.getCategoryUri(f"{theme}"),
-        lang='eng'
-    )
-    articles = []
-    for art in q.execQuery(er, sortBy = "date", maxItems=n):
-        articles.append({
-            'uri': art['uri'],
-            'title': art['title'],
-            'body': art['body']
-        })
-
-    # Use GPT to summarize article's body
-    for i in range(len(articles)):
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": f"Summarize the following article in the style of a news broadcast. Retain important facts and key ideas presented. Only provide your summary and no extra message."},
-                {"role": "user", "content": f"{raw_data[i]['body']}"}
-            ]
-        )
-        articles[i]['summary'] = completion.choices[0].message.content
-
-    return articles
-
     
 '''
     Returns a finalized script for a news broadcast given a set of articles
@@ -109,7 +80,7 @@ def generate_script(articles, style="newscaster"):
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": f"You are a news script writer. You will take in a list of summarized news articles and their titles, and produce a script for the day in the style of {style}"},
+            {"role": "system", "content": f"You are a news script writer. You will take in a list of summarized news articles and their titles, and produce a script for the day in the style of {style}. Do not include any text,except what should be spoken. Do not leave openings for reporters names. It should read as a story. No introduction or closing, only the content. "},
             {"role": "user", "content": f"Create a news script from the following articles: {bulk}"}
         ]
     )
@@ -135,6 +106,14 @@ def summarize_article(article):
         article['summary'] = completion.choices[0].message.content
     except Exception as e:
         print("Error in summarizing article:", str(e))
+
+
+def generate_pod_audio(script):
+    tts = gTTS(script)
+    local_file = f"./tmp/test_audio.mp3"
+    tts.save(local_file)
+    return
+
 
 def get_news_from_params(params, n=10):
 
@@ -176,8 +155,10 @@ def get_news_from_params(params, n=10):
 
 
 if __name__ == "__main__":
-    pass
-    # articles = users.get_user_articles('frank123')
-    # script = generate_script(articles)
+    articles = users.get_user_articles('frank123')
+    script = generate_script(articles)
+    users.save_daily_script('frank123', script)
+    # print(f"script: {script}")
+    generate_pod_audio(script)
     # print(script)
 
