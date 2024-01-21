@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from eventregistry import *
 from user_model import UserModel
+import concurrent.futures
 
 
 # Load environment variables from .env
@@ -50,8 +51,6 @@ def get_articles_from_api(categories, n=10):
             'meta': {k: v for k, v in art.items() if k not in ['body', 'title', 'url']}
         })
     
-    print(f"articles: {articles}")
-
     return articles
 
 
@@ -92,7 +91,7 @@ def get_latest_articles(theme, n=1):
 
     return articles
 
-
+    
 '''
     Returns a finalized script for a news broadcast given a set of articles
     Params:
@@ -115,7 +114,27 @@ def generate_script(articles, style="newscaster"):
         ]
     )
 
+    return completion.choices[0].message.content
 
+def summarize_article(article):
+    try :
+        if 'summary' in article:
+            return
+        
+        print(f"getting summary for article: {article['uri']}")
+
+        completion = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": f"Summarize the following article in the style of a news broadcast. Retain important facts and key ideas presented. Only provide your summary and no extra message."},
+                    {"role": "user", "content": f"{article['body']}"}
+                ],
+                max_tokens=150
+            )
+        
+        article['summary'] = completion.choices[0].message.content
+    except Exception as e:
+        print("Error in summarizing article:", str(e))
 
 def get_news_from_params(params, n=10):
 
@@ -131,7 +150,6 @@ def get_news_from_params(params, n=10):
 
     articles = []
 
-    # TODO: check DB for articles
     user_artices = users.get_user_articles(userId)
     if not user_artices:
         # User doesn't exist, create
@@ -143,7 +161,12 @@ def get_news_from_params(params, n=10):
     # Query API for missing articles
     n = n - len(articles)
     articles.extend(get_articles_from_api(categories, n))
+
     # Generate summaries for articles
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(summarize_article, article) for article in articles]
+        concurrent.futures.wait(futures)
+
 
     # TODO: Store articles in DB
     users.update_user_articles(userId, articles)
@@ -153,7 +176,8 @@ def get_news_from_params(params, n=10):
 
 
 if __name__ == "__main__":
-    articles = get_latest_articles("technology")
-    script = generate_script(articles)
-    print(script)
+    pass
+    # articles = users.get_user_articles('frank123')
+    # script = generate_script(articles)
+    # print(script)
 

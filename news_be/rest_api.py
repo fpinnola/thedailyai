@@ -11,9 +11,9 @@ def handle_get_news():
     # Get request body
     data = request.json    
 
-    news = get_news_from_params(data)
+    articles = get_news_from_params(data)
 
-    return jsonify(news)
+    return jsonify(articles)
 
 
 if __name__ == '__main__':

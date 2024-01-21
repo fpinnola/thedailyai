@@ -59,7 +59,34 @@ class UserModel:
         
         return user['articles']
         
+    def save_daily_script(self, userId, script):
+        new_user = self.users.update_one({
+            'userId': userId
+        }, {
+            '$set': { 
+                'dailyScript': script,
+                'scriptDate': datetime.now()
+             }
+        })
+        return new_user
+    
+    def get_daily_script(self, userId):
+        user = self.get_user(userId)
+
+
+        # User does not exist
+        if not user:
+            return None
         
+        # No articles stored
+        if not user['dailyScript'] or not user['scriptDate']:
+            return ''
+        
+        # Articles don't match current day
+        if not is_same_day_as_today(user['scriptDate']):
+            return ''
+        
+        return user['script']
 
 
 if __name__ == '__main__':
