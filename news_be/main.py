@@ -7,12 +7,21 @@ from user_model import UserModel
 import concurrent.futures
 from gtts import gTTS
 import os
+import boto3
+from datetime import datetime
 
 
 # Load environment variables from .env
 load_dotenv()
 
+
+# Load env variables
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
+AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
+AWS_ACCESS_KEY_SECRET = os.getenv('AWS_ACCESS_KEY_SECRET')
+AWS_REGION = os.getenv('AWS_REGION')
+AWS_BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
+
 er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
 client = OpenAI()
 users = UserModel()
@@ -108,11 +117,30 @@ def summarize_article(article):
         print("Error in summarizing article:", str(e))
 
 
-def generate_pod_audio(script):
+def generate_pod_audio(userId, script):
     tts = gTTS(script)
-    local_file = f"./tmp/test_audio.mp3"
+    unique_file_name = f"{userId}pod-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+    local_file = f"./tmp/{unique_file_name}.mp3"
     tts.save(local_file)
-    return
+
+    audio_url = save_file_to_s3(unique_file_name)
+    
+    return audio_url
+
+def save_file_to_s3(file_name):
+    session = boto3.Session(
+        aws_access_key_id=AWS_ACCESS_KEY,
+        aws_secret_access_key=AWS_ACCESS_KEY_SECRET,
+        region_name=AWS_REGION
+    )
+    s3 = session.resource('s3')
+
+    s3_object_key = f"{file_name}.mp3"
+    s3.Bucket(AWS_BUCKET_NAME).upload_file(f"./tmp/{file_name}.mp3", s3_object_key)
+
+    s3_url = f"https://{AWS_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{s3_object_key}"
+
+    return s3_url
 
 
 def get_news_from_params(params, n=10):
@@ -152,13 +180,33 @@ def get_news_from_params(params, n=10):
 
     return articles
 
+def get_user_podcast(params):
+
+    userId = params['userId']
+    style = params['style']
+
+    script = users.get_daily_script(userId)
+
+    if not script:
+        # User does not exist
+        raise Exception('User does not exist')
+
+    if not len(script):
+        articles = users.get_user_articles(userId)
+        script = generate_script(articles, style)
+        users.save_daily_script(userId, script)
+
+    audio_url = users.get_daily_audio(userId)
+
+    if not len(audio_url):
+        audio_url = generate_pod_audio(userId, script)
+        users.set_daily_audio(userId, audio_url)
+
+    return audio_url
+
+
+
 
 
 if __name__ == "__main__":
-    articles = users.get_user_articles('frank123')
-    script = generate_script(articles)
-    users.save_daily_script('frank123', script)
-    # print(f"script: {script}")
-    generate_pod_audio(script)
-    # print(script)
-
+    pass

@@ -86,7 +86,36 @@ class UserModel:
         if not is_same_day_as_today(user['scriptDate']):
             return ''
         
-        return user['script']
+        return user['dailyScript']
+    
+    def set_daily_audio(self, userId, audio_url):
+        new_user = self.users.update_one({
+            'userId': userId
+        }, {
+            '$set': { 
+                'dailyAudioURL': audio_url,
+                'dailyAudioDate': datetime.now()
+             }
+        })
+        return new_user
+    
+    def get_daily_audio(self, userId):
+        user = self.get_user(userId)
+
+
+        # User does not exist
+        if not user:
+            return None
+        
+        # No articles stored
+        if not user['dailyAudioURL'] or not user['dailyAudioDate']:
+            return ''
+        
+        # Articles don't match current day
+        if not is_same_day_as_today(user['dailyAudioDate']):
+            return ''
+        
+        return user['dailyAudioURL']
 
 
 if __name__ == '__main__':

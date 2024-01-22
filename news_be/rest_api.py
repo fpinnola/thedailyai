@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import get_news_from_params
+from main import get_news_from_params, get_user_podcast
 
 app = Flask(__name__)
 CORS(app)
@@ -14,6 +14,19 @@ def handle_get_news():
     articles = get_news_from_params(data)
 
     return jsonify(articles)
+
+@app.route('/getAudio', methods=['POST'])
+def handle_get_audio():
+
+    data = request.json
+
+    audio_url = get_user_podcast(data)
+
+    response_obj = {
+        'audio_url': audio_url
+    }
+
+    return jsonify(response_obj)
 
 
 if __name__ == '__main__':
