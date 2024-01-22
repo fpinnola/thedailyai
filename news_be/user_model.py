@@ -50,7 +50,7 @@ class UserModel:
             return None
         
         # No articles stored
-        if not user['articles'] or not user['articlesDate']:
+        if not 'articles' in user or not 'articlesDate' in user:
             return []
         
         # Articles don't match current day
@@ -79,7 +79,7 @@ class UserModel:
             return None
         
         # No articles stored
-        if not user['dailyScript'] or not user['scriptDate']:
+        if not 'dailyScript' in user or not 'scriptDate' in user:
             return ''
         
         # Articles don't match current day
@@ -108,7 +108,7 @@ class UserModel:
             return None
         
         # No articles stored
-        if not user['dailyAudioURL'] or not user['dailyAudioDate']:
+        if not 'dailyAudioURL' in user or not 'dailyAudioDate' in user:
             return ''
         
         # Articles don't match current day

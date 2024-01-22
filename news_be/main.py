@@ -187,12 +187,13 @@ def get_user_podcast(params):
 
     script = users.get_daily_script(userId)
 
-    if not script:
+    if script is None:
         # User does not exist
         raise Exception('User does not exist')
 
     if not len(script):
         articles = users.get_user_articles(userId)
+        print(articles)
         script = generate_script(articles, style)
         users.save_daily_script(userId, script)
 
