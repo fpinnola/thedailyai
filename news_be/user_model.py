@@ -1,5 +1,4 @@
 from datetime import datetime
-from pymongo import MongoClient
 
 def is_same_day_as_today(date_to_check):
     # Get today's date
@@ -9,8 +8,8 @@ def is_same_day_as_today(date_to_check):
     return date_to_check.date() == today
 
 class UserModel:
-    def __init__(self) -> None:
-        self.client = MongoClient("localhost", 27017)
+    def __init__(self, client) -> None:
+        self.client = client
         self.db = self.client.news_db
         self.users = self.db.user_collection
         

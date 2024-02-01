@@ -9,6 +9,7 @@ from gtts import gTTS
 import os
 import boto3
 from datetime import datetime
+from pymongo import MongoClient
 
 
 # Load environment variables from .env
@@ -24,7 +25,8 @@ AWS_BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
 
 er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
 client = OpenAI()
-users = UserModel()
+db_client = MongoClient("localhost", 27017)
+users = UserModel(db_client)
 
 THEMES =["business", "technology", "politics", "biotech"]
 STYLES = ["newscaseter", "humorous", "serious"]
