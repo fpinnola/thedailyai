@@ -34,7 +34,7 @@ class ArticleModel:
 
         # Execute the query
         results = self.articles.find(query)
-        return results
+        return list(results)
     
     def get_articles_category_since(self, categories, date):
         query = {

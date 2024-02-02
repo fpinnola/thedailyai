@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -6,11 +7,11 @@ from eventregistry import *
 from user_model import UserModel
 import concurrent.futures
 from gtts import gTTS
-import os
 import boto3
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from pymongo import MongoClient
-
+from sources_model import SourcesModel
+from article_model import ArticleModel
 
 # Load environment variables from .env
 load_dotenv()
@@ -27,6 +28,8 @@ er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
 client = OpenAI()
 db_client = MongoClient("localhost", 27017)
 users = UserModel(db_client)
+articles = ArticleModel(db_client)
+scrape_sources = SourcesModel(db_client)
 
 THEMES =["business", "technology", "politics", "biotech"]
 STYLES = ["newscaseter", "humorous", "serious"]
@@ -39,6 +42,62 @@ SAMPLE_DATA = [
     { 'title': 'Global Internet to Shut Down for Maintenance', 'url': 'https://example.com/global-internet-shutdown', 'summary': 'Authorities announce a scheduled global internet shutdown for system upgrades.' }
 ]
 
+from sources.hackernews import get_best_articles
+
+
+def is_within_n_days(input_date, n_days):
+    """
+    Check if the given date is within n_days from today.
+
+    :param input_date: The date to check, as a datetime.date object or a string in the format 'YYYY-MM-DD'.
+    :param n_days: Number of days to check within, as an integer.
+    :return: True if the date is within n_days from today, False otherwise.
+    """
+    # Ensure input_date is a datetime.date object
+    if isinstance(input_date, str):
+        input_date = datetime.strptime(input_date, "%Y-%m-%d").date()
+
+    # Get today's date
+    today = date.today()
+
+    # Calculate the difference in days
+    day_difference = abs((input_date - today).days)
+
+    # Check if the difference is within n_days
+    return day_difference <= n_days
+
+
+def get_articles_from_hackernews(categories, n=10):
+    print(f"Requesting {n} articles from hackernews")
+    if not n:
+        # Requesting 0 articles
+        return []
+    
+    # Check if new scrape needed
+    last_scrape = scrape_sources.time_since_scrape("hackernews")
+    print(f"last scrape {last_scrape}")
+    if not last_scrape or not is_within_n_days(last_scrape.date(), 5):
+        # Need to update articles with latest from hackernews
+        new_articles = get_best_articles(max_articles=3, within_days=5)
+        print(f"got new articles {new_articles}")
+        
+        # TODO: categorize and summarize articles
+
+        # Store new articles in db
+        for article in new_articles:
+            article_id = str(uuid.uuid4())
+            articles.save_article(article_id, article['title'], article['raw_text'], 'none', article['url'], 'none', article['date'])
+
+        # Update scrape sources to prevent future scrapes
+        scrape_sources.update_since_scrape("hackernews", datetime.now())
+
+    # Query Articles DB for relevant articles
+    twenty_four_hours_ago = datetime.now() - timedelta(days=5)
+    response = articles.get_articles_since(twenty_four_hours_ago)
+
+    return response
+
+    
 
 '''
     Returns n latest articles given categories
@@ -212,4 +271,6 @@ def get_user_podcast(params):
 
 
 if __name__ == "__main__":
+    response = get_articles_from_hackernews([], 10)
+    print(response)
     pass
