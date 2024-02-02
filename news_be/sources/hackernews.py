@@ -52,8 +52,7 @@ def get_best_articles(max_articles=5, within_days=5):
     article_ids = requests.get("https://hacker-news.firebaseio.com/v0/beststories.json").json()
 
     articles_data = []
-    # for i in range(len(article_ids)):
-    for i in range(15):
+    for i in range(len(article_ids)):
         article = get_article_by_id(article_ids[i])
         try:
             if not ('url' in article):

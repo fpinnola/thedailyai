@@ -228,7 +228,7 @@ def get_news_from_params(params, n=10):
 
     # Query API for missing articles
     n = n - len(articles)
-    articles.extend(get_articles_from_api(categories, n))
+    articles.extend(get_articles_from_hackernews(categories, n))
 
     # Generate summaries for articles
     with concurrent.futures.ThreadPoolExecutor() as executor:
