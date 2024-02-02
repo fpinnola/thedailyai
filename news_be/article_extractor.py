@@ -1,5 +1,6 @@
 # import the necessary functions
 from trafilatura import fetch_url, extract
+import json
 
 def get_article_info(articleURL):
 
@@ -13,9 +14,14 @@ def get_article_info(articleURL):
     # change the output format to XML (allowing for preservation of document structure)
     result = extract(downloaded, output_format="json")
 
-    return result
+    if not result:
+        return None
+
+    return json.loads(result)
 
 
 if __name__ == "__main__":
-    print(get_article_info("https://www.cnn.com/2024/01/22/business/ftc-turbotax-free-services/index.html"))
+    ai = get_article_info("https://www.cnn.com/2024/01/22/business/ftc-turbotax-free-services/index.html")
+    print(ai)
+    print(type(ai))
 
