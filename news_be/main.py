@@ -92,8 +92,8 @@ def get_articles_from_hackernews(categories, n=10):
     print(f"last scrape {last_scrape}")
     if not last_scrape or not is_within_n_days(last_scrape.date(), 5):
         # Need to update articles with latest from hackernews
-        new_articles = get_best_articles(max_articles=3, within_days=5)
-        print(f"got new articles {new_articles}")
+        new_articles = get_best_articles(max_articles=None, within_days=5)
+        print(f"got {len(new_articles)} new articles")
         
         # TODO: categorize and summarize articles
 
@@ -244,6 +244,8 @@ def get_news_from_params(params, n=10):
     n = n - len(articles)
     articles.extend(get_articles_from_hackernews(categories, n))
 
+    print(len(articles))
+
     # Generate summaries for articles
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(summarize_article, article) for article in articles]
@@ -288,5 +290,6 @@ def get_user_podcast(params):
 
 if __name__ == "__main__":
     response = get_articles_from_hackernews([], 10)
-    print(response)
+    print(len(response)) 
+
     pass

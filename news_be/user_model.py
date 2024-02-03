@@ -31,6 +31,7 @@ class UserModel:
         return new_user
 
     def update_user_articles(self, userId, articles):
+        print(f"upatading user {userId} with {len(articles)} articles")
         new_user = self.users.update_one({
             'userId': userId
         }, {
