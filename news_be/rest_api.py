@@ -13,7 +13,7 @@ def handle_get_news():
 
     articles = get_news_from_params(data)
 
-    return jsonify(articles)
+    return articles
 
 @app.route('/getAudio', methods=['POST'])
 def handle_get_audio():

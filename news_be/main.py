@@ -12,6 +12,8 @@ from datetime import datetime, timedelta, date
 from pymongo import MongoClient
 from sources_model import SourcesModel
 from article_model import ArticleModel
+from bson import json_util
+
 
 # Load environment variables from .env
 load_dotenv()
@@ -43,6 +45,18 @@ SAMPLE_DATA = [
 ]
 
 from sources.hackernews import get_best_articles
+from bson import ObjectId
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return json.JSONEncoder.default(self,o)
+
+def parse_json(data):
+    return JSONEncoder().encode(data)
 
 
 def is_within_n_days(input_date, n_days):
@@ -239,7 +253,9 @@ def get_news_from_params(params, n=10):
     # TODO: Store articles in DB
     users.update_user_articles(userId, articles)
 
-    return articles
+    print(f"articles: {articles}")
+
+    return parse_json(articles)
 
 def get_user_podcast(params):
 
