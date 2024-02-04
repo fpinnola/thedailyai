@@ -19,7 +19,6 @@ class ArticleModel:
 
     def __init__(self, client) -> None:
         if not hasattr(self, 'initialized'):
-            print(f"HERE")
             self.client = client
             self.db = self.client.news_db
             self.articles = self.db.articles

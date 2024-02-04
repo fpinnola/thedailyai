@@ -89,20 +89,25 @@ def get_articles_from_hackernews(categories, n=10):
     
     # Check if new scrape needed
     last_scrape = scrape_sources.time_since_scrape("hackernews")
-    print(f"last scrape {last_scrape}")
     if not last_scrape or not is_within_n_days(last_scrape.date(), 1):
         # Need to update articles with latest from hackernews
         new_articles = get_best_articles(max_articles=15, within_days=5)
         print(f"got {len(new_articles)} new articles")
         
-        # TODO: categorize and summarize articles
+        
 
         # Store new articles in db
         for article in new_articles:
+            # TODO: categorize and summarize articles
+            article['body'] = article['raw_text']
+            summarize_article(article)
             article_id = str(uuid.uuid4())
             if not 'externalId' in article:
                 article['externalId'] = None
-            articles.save_article(article_id, article['title'], article['raw_text'], 'none', article['url'], 'none', article['date'], article['externalId'])
+            if (not 'summary' in article) or (not 'category' in article):
+                print(f"Issue getting summary or cateogry for article {article['title']}")
+                continue
+            articles.save_article(article_id, article['title'], article['raw_text'], article['summary'], article['url'], article['category'], article['date'], article['externalId'])
 
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("hackernews", datetime.now())
@@ -178,18 +183,24 @@ def summarize_article(article):
         if 'summary' in article:
             return
         
-        print(f"getting summary for article: {article['uri']}")
+        # print(f"getting summary for article: {article['uri']}")
 
         completion = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-3.5-turbo-1106",
                 messages=[
-                    {"role": "system", "content": f"Summarize the following article in the style of a news broadcast. Retain important facts and key ideas presented. Only provide your summary and no extra message."},
+                    {"role": "system", "content": f"Summarize the following article in the style of a news broadcast. Retain important facts and key ideas presented. Only provide your summary and no extra message. Keep your summary concise, less than 200 words. Output your resposnse as a json object with two properties, 'summary' which is the summary, and 'category' which is  one of the following 'technology', 'software', 'biotech', 'politics', or 'other'."},
                     {"role": "user", "content": f"{article['body']}"}
                 ],
-                max_tokens=150
+                max_tokens=300,
+                response_format={ "type": "json_object" }
             )
         
-        article['summary'] = completion.choices[0].message.content
+        response = completion.choices[0].message.content
+        print(response)
+        obj = json.loads(response)
+
+        article['summary'] = obj['summary']
+        article['category'] = obj['category']
     except Exception as e:
         print("Error in summarizing article:", str(e))
 
@@ -291,7 +302,14 @@ def get_user_podcast(params):
 
 
 if __name__ == "__main__":
-    response = get_articles_from_hackernews([], 10)
-    print(len(response)) 
+    res = get_articles_from_hackernews([])
+    # print(res)
 
+    # article_body = "TOKYO -- Japan will establish a new visa status that will make it easier for IT engineers and other workers for overseas companies to reside in the country, the Immigration Services Agency said Friday. The planned status will allow highly skilled workers to work in Japan on a teleworking basis for up to six months while enjoying sightseeing trips, the agency said."
+    # article = {
+    #     'body': article_body
+    # }
+    # summary = summarize_article(article)
+    # print(article)
+ 
     pass
