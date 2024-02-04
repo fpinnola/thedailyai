@@ -90,9 +90,9 @@ def get_articles_from_hackernews(categories, n=10):
     # Check if new scrape needed
     last_scrape = scrape_sources.time_since_scrape("hackernews")
     print(f"last scrape {last_scrape}")
-    if not last_scrape or not is_within_n_days(last_scrape.date(), 5):
+    if not last_scrape or not is_within_n_days(last_scrape.date(), 1):
         # Need to update articles with latest from hackernews
-        new_articles = get_best_articles(max_articles=None, within_days=5)
+        new_articles = get_best_articles(max_articles=15, within_days=5)
         print(f"got {len(new_articles)} new articles")
         
         # TODO: categorize and summarize articles
@@ -100,7 +100,9 @@ def get_articles_from_hackernews(categories, n=10):
         # Store new articles in db
         for article in new_articles:
             article_id = str(uuid.uuid4())
-            articles.save_article(article_id, article['title'], article['raw_text'], 'none', article['url'], 'none', article['date'])
+            if not 'externalId' in article:
+                article['externalId'] = None
+            articles.save_article(article_id, article['title'], article['raw_text'], 'none', article['url'], 'none', article['date'], article['externalId'])
 
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("hackernews", datetime.now())

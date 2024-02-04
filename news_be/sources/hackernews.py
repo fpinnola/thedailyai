@@ -4,6 +4,7 @@ import random
 from datetime import datetime, timedelta, date, time
 
 from article_extractor import get_article_info
+from article_model import ArticleModel
 
 
 
@@ -51,9 +52,15 @@ def get_best_articles(max_articles=5, within_days=5):
 
     article_ids = requests.get("https://hacker-news.firebaseio.com/v0/beststories.json").json()
 
+    articleModel = ArticleModel(None)
+
     articles_data = []
     for i in range(len(article_ids)):
         article = get_article_by_id(article_ids[i])
+        external_id = 'hn' + str(article_ids[i])
+        if articleModel.does_article_with_external_id_exist(external_id):
+            print(f"external id already exists {external_id}")
+            continue
         try:
             if not ('url' in article):
                 continue
@@ -63,6 +70,7 @@ def get_best_articles(max_articles=5, within_days=5):
             date_to_compare = datetime.strptime(article_data['date'], "%Y-%m-%d").date()
             article_data['date'] = datetime.combine(date_to_compare, time.min)
             article_data['url'] = article['url']
+            article_data['externalId'] = external_id
             if is_within_n_days(date_to_compare, within_days):
                 articles_data.append(article_data)
             else:
