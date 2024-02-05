@@ -18,3 +18,30 @@
   position: relative;
   border: 1px solid transparent;
 }
+
+.searchInputContainer {
+  display: flex;
+  align-items: center;
+  padding: 0px;
+  border-radius: 5px; /* Rounded corners */
+  background-color: white; /* Background color */
+  width: 80%;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 5px 0 0 5px; /* Align the radius with the container */
+}
+
+.searchButton {
+  padding: 8px 15px;
+  border: none;
+  background-color: #007bff; /* Example button color */
+  color: white;
+  cursor: pointer;
+  border-radius: 5px 5px 5px 5px; /* Align the radius with the container */
+  margin: none;
+}
