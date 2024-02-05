@@ -4,3 +4,17 @@
   padding: 2rem;
   text-align: center;
 }
+
+.slider-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.slider-children {
+  height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+  border: 1px solid transparent;
+}

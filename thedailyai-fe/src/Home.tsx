@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getNews, getPodcast } from "./external/news_be.external";
+import StoryCard from "./components/StoryCard";
 
 const USER_ID_TEST = 'frank123';
 
@@ -11,13 +12,13 @@ export default function Home() {
 
     // const [podcastScript, setPodcastScript] = useState('');
 
-    const fetchDailyPodcast = async (preferences: any) => {
-        console.log(`Sending preferences: ${JSON.stringify(preferences)}`);
+    // const fetchDailyPodcast = async (preferences: any) => {
+    //     console.log(`Sending preferences: ${JSON.stringify(preferences)}`);
         
-        let podcastURL: string = await getPodcast(preferences);
-        console.log(`Got podcastURL: ${podcastURL}`);
-        setPodcastAudioURL(podcastURL);
-    }
+    //     let podcastURL: string = await getPodcast(preferences);
+    //     console.log(`Got podcastURL: ${podcastURL}`);
+    //     setPodcastAudioURL(podcastURL);
+    // }
 
     useEffect(() => {
         // TODO: get articles from backend
@@ -28,7 +29,7 @@ export default function Home() {
             preferences.userId = USER_ID_TEST;
             let news: any[] = await getNews(preferences);
             setArticles(news);
-            fetchDailyPodcast(preferences);
+            // fetchDailyPodcast(preferences);
         }
 
         wrapper();
@@ -49,21 +50,22 @@ export default function Home() {
     return (
         <>
             <h3>Your News for {getDate()}</h3>
-            {!podcastAudioURL.length ? null : (
+            {/* {!podcastAudioURL.length ? null : (
                 <div>
                     <h4>Your daily podcast</h4>
                     <audio controls>
                         <source src={podcastAudioURL} type="audio/mpeg" />
                     </audio>
                 </div>
-            )}
-            <div>
+            )} */}
+            <div className="slider-container">
                 {articles.map((elem) => (
-                    <div>
-                        <h4>{elem.title}</h4>
-                        <p>{elem.summary}</p>
-                        <a href={elem.url}>Read more</a>
-                    </div>
+                    <StoryCard title={elem.title} summary={elem.summary} />
+                    // <div>
+                    //     <h4>{elem.title}</h4>
+                    //     <p>{elem.summary}</p>
+                    //     <a href={elem.url}>Read more</a>
+                    // </div>
                 ) )}
             </div>
         </>
