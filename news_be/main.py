@@ -1,5 +1,6 @@
 import os
 import uuid
+import random
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -83,7 +84,7 @@ def is_within_n_days(input_date, n_days):
 
 def get_articles_from_hackernews(categories, n=10):
     print(f"Requesting {n} articles from hackernews")
-    if not n:
+    if not n or n <=0:
         # Requesting 0 articles
         return []
     
@@ -116,7 +117,11 @@ def get_articles_from_hackernews(categories, n=10):
     twenty_four_hours_ago = datetime.now() - timedelta(days=5)
     response = articles.get_articles_since(twenty_four_hours_ago)
 
-    return response
+    N = min(n, len(response))
+    # Randomly select N elements from the list
+    selected_elements = random.sample(response, N)
+    print(N)
+    return selected_elements
 
     
 
@@ -255,18 +260,21 @@ def get_news_from_params(params, n=10):
 
     # Query API for missing articles
     n = n - len(articles)
+    # TODO: only add artiles if not already on user
     articles.extend(get_articles_from_hackernews(categories, n))
 
     print(len(articles))
 
+    # TODO: consolidate flow
     # Generate summaries for articles
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(summarize_article, article) for article in articles]
-        concurrent.futures.wait(futures)
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     futures = [executor.submit(summarize_article, article) for article in articles]
+    #     concurrent.futures.wait(futures)
 
 
     # TODO: Store articles in DB
-    users.update_user_articles(userId, articles)
+    if (n > 0):
+        users.update_user_articles(userId, articles)
 
     print(f"articles: {articles}")
 
