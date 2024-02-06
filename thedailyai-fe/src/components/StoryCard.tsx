@@ -1,3 +1,4 @@
+import PagedTextViewer from "./PagedTextViewer";
 import QuestionInput from "./QuestionInput";
 
 
@@ -21,11 +22,12 @@ const StoryCard = ({ title, summary }: { title: string, summary: string } ) => {
                 padding: '5px 5px 10px 10px'
             }}>
                 <h4>{title}</h4>
-                <p>{truncateText(summary)}</p>
+                <PagedTextViewer text={summary} />
+                {/* <p>{truncateText(summary)}</p> */}
                 <QuestionInput />
-                <button style={{
+                {/* <button style={{
                     backgroundColor: '#afafaf'
-                 }}>Read more</button>
+                 }}>Read more</button> */}
             </div>
         </div>
     )

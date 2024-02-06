@@ -28,6 +28,7 @@ export default function Home() {
             const preferences = JSON.parse(prefString)
             preferences.userId = USER_ID_TEST;
             let news: any[] = await getNews(preferences);
+            console.log(`${news.length} articles`)
             setArticles(news);
             // fetchDailyPodcast(preferences);
         }
@@ -59,8 +60,8 @@ export default function Home() {
                 </div>
             )} */}
             <div className="slider-container">
-                {articles.map((elem) => (
-                    <StoryCard title={elem.title} summary={elem.summary} />
+                {articles.map((elem, index) => (
+                    <StoryCard key={elem.title + index} title={elem.title} summary={elem.summary} />
                     // <div>
                     //     <h4>{elem.title}</h4>
                     //     <p>{elem.summary}</p>
