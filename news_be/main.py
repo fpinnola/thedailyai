@@ -236,6 +236,12 @@ def save_file_to_s3(file_name):
     return s3_url
 
 
+def is_article_in_list(article, articles):
+    for a in articles:
+        if a['externalId'] == article['externalId']:
+            return True
+    return False
+
 def get_news_from_params(params, n=10):
 
     categories = params['categories']
@@ -261,7 +267,10 @@ def get_news_from_params(params, n=10):
     # Query API for missing articles
     n = n - len(articles)
     # TODO: only add artiles if not already on user
-    articles.extend(get_articles_from_hackernews(categories, n))
+    new_articles = get_articles_from_hackernews(categories, n)
+    for article in new_articles:
+        if not is_article_in_list(article, articles):
+            articles.extend(article)
 
     print(len(articles))
 
