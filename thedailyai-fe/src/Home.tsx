@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getNews, getPodcast } from "./external/news_be.external";
+import { getNews } from "./external/news_be.external";
 import StoryCard from "./components/StoryCard";
 
 const USER_ID_TEST = 'frank123';
@@ -8,7 +8,7 @@ export default function Home() {
 
     const [articles, setArticles] = useState<any[]>([]);
 
-    const [podcastAudioURL, setPodcastAudioURL] = useState('');
+    // const [podcastAudioURL, setPodcastAudioURL] = useState('');
 
     // const [podcastScript, setPodcastScript] = useState('');
 

@@ -1,15 +1,7 @@
 import PagedTextViewer from "./PagedTextViewer";
-import QuestionInput from "./QuestionInput";
 
 
 const StoryCard = ({ title, summary }: { title: string, summary: string } ) => {
-
-    const truncateText = (inputText: string) => {
-        if (inputText.length > 500) {
-          return `${inputText.substring(0, 500)}...`;
-        }
-        return inputText;
-    };
 
     return (
         <div className="slider-children">
