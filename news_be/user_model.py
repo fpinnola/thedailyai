@@ -1,4 +1,5 @@
 from datetime import datetime
+from utils import is_within_n_hours
 
 def is_same_day_as_today(date_to_check):
     # Get today's date
@@ -54,7 +55,7 @@ class UserModel:
             return []
         
         # Articles don't match current day
-        if not is_same_day_as_today(user['articlesDate']):
+        if not is_within_n_hours(user['articlesDate'], 8):
             return []
         
         return user['articles']

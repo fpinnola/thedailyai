@@ -15,6 +15,8 @@ from sources_model import SourcesModel
 from article_model import ArticleModel
 from bson import json_util
 
+from utils import is_within_n_hours
+
 
 # Load environment variables from .env
 load_dotenv()
@@ -91,7 +93,7 @@ def get_articles_from_hackernews(categories, n=10):
     
     # Check if new scrape needed
     last_scrape = scrape_sources.time_since_scrape("hackernews")
-    if not last_scrape or not is_within_n_days(last_scrape.date(), 1):
+    if not last_scrape or not is_within_n_hours(last_scrape, 8):
         # Need to update articles with latest from hackernews
         new_articles = get_best_articles(max_articles=15, within_days=5)
         print(f"got {len(new_articles)} new articles")
@@ -275,12 +277,6 @@ def get_news_from_params(params, n=10):
             temp_articles.append(article)
 
     articles.extend(temp_articles)
-
-    # TODO: consolidate flow
-    # Generate summaries for articles
-    # with concurrent.futures.ThreadPoolExecutor() as executor:
-    #     futures = [executor.submit(summarize_article, article) for article in articles]
-    #     concurrent.futures.wait(futures)
 
 
     # TODO: Store articles in DB
