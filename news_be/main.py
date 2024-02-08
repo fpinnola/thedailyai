@@ -266,13 +266,14 @@ def get_news_from_params(params, n=10):
 
     # Query API for missing articles
     n = n - len(articles)
-    # TODO: only add artiles if not already on user
     new_articles = get_articles_from_hackernews(categories, n)
+
+    temp_articles = []
     for article in new_articles:
         if not is_article_in_list(article, articles):
-            articles.extend(article)
+            temp_articles.append(article)
 
-    print(len(articles))
+    articles.extend(temp_articles)
 
     # TODO: consolidate flow
     # Generate summaries for articles
