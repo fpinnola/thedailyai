@@ -287,7 +287,7 @@ def get_news_from_params(params, n=10):
     if (n > 0):
         users.update_user_articles(userId, articles)
 
-    print(f"articles: {articles}")
+    print(f"articles {str(articles)[:500] + '...' if len(str(articles)) > 500 else str(articles)}")
 
     return parse_json(articles)
 
