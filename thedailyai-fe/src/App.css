@@ -12,6 +12,10 @@
   scroll-behavior: smooth;
 }
 
+.slider-container::-webkit-scrollbar {
+  display: none;
+}
+
 .slider-children {
   height: 100vh;
   scroll-snap-align: start;
