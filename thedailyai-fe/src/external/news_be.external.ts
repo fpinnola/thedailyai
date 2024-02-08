@@ -1,6 +1,7 @@
 import axios from "axios";
+import { BE_BASE_URL } from "../config";
 
-const baseURL = 'http://127.0.0.1:5000';
+const baseURL = BE_BASE_URL || 'http://127.0.0.1:5000';
 
 export async function getNews(preferences: any): Promise<any[]> {
     let reqURL = baseURL + '/getNews';
