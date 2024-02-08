@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from main import get_news_from_params, get_user_podcast
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -34,4 +35,4 @@ if __name__ == '__main__':
     if DEV:
         app.run(debug=True)
     else:
-        app.run(host='0.0.0.0', port=5000)
+        app.run(debug=True, host='0.0.0.0', port=5000)
