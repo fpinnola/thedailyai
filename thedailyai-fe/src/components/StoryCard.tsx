@@ -14,7 +14,7 @@ const StoryCard = ({ title, summary }: { title: string, summary: string } ) => {
                 padding: '5px 5px 10px 10px'
             }}>
                 <h4>{title}</h4>
-                <PagedTextViewer text={summary} charsPerPage={1000} />
+                <PagedTextViewer text={summary} charsPerPage={900} />
                 {/* <p>{truncateText(summary)}</p> */}
                 {/* <QuestionInput /> */}
                 {/* <button style={{
