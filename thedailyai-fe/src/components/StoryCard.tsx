@@ -11,7 +11,7 @@ const StoryCard = ({ title, summary }: { title: string, summary: string } ) => {
                 display: 'flex',
                 height: '100%',
                 flexDirection: 'column',
-                padding: '5px 5px 10px 10px'
+                padding: '0px 5px 0px 5px',
             }}>
                 <h4>{title}</h4>
                 <PagedTextViewer text={summary} charsPerPage={900} />

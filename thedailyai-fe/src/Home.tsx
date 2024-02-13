@@ -50,7 +50,18 @@ export default function Home() {
 
     return (
         <>
-            <h3>Your News for {getDate()}</h3>
+            <div style={{
+                position: 'absolute',
+                top: 50,
+                width: '100%',
+                left: 0
+            }}>
+                <h4 style={{
+                    textAlign: 'center',
+                    opacity: 0.6
+                }}>Your News for {getDate()}</h4>
+            </div>
+
             {/* {!podcastAudioURL.length ? null : (
                 <div>
                     <h4>Your daily podcast</h4>
