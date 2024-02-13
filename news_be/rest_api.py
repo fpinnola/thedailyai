@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import get_news_from_params, get_user_podcast
+from main import get_news_from_params, get_user_podcast, update_news_articles
 import os
 
 app = Flask(__name__)
@@ -29,6 +29,10 @@ def handle_get_audio():
 
     return jsonify(response_obj)
 
+@app.route('/news/refresh', methods=['GET'])
+def handle_update_news():
+    update_news_articles()
+    return "Began"
 
 if __name__ == '__main__':
     DEV = False

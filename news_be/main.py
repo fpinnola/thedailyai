@@ -85,21 +85,16 @@ def is_within_n_days(input_date, n_days):
     return day_difference <= n_days
 
 
-def get_articles_from_hackernews(categories, n=10):
-    print(f"Requesting {n} articles from hackernews")
-    if not n or n <=0:
-        # Requesting 0 articles
-        return []
-    
+def update_news_articles():
     # Check if new scrape needed
     last_scrape = scrape_sources.time_since_scrape("hackernews")
     if not last_scrape or not is_within_n_hours(last_scrape, 8):
+        # TODO: add lock so multiple simultaneous runs not possible
+
         # Need to update articles with latest from hackernews
         new_articles = get_best_articles(max_articles=15, within_days=5)
         print(f"got {len(new_articles)} new articles")
         
-        
-
         # Store new articles in db
         for article in new_articles:
             # TODO: categorize and summarize articles
@@ -116,6 +111,13 @@ def get_articles_from_hackernews(categories, n=10):
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("hackernews", datetime.now())
 
+
+def get_articles_from_hackernews(categories, n=10):
+    print(f"Requesting {n} articles from hackernews")
+    if not n or n <=0:
+        # Requesting 0 articles
+        return []
+    
     # Query Articles DB for relevant articles
     twenty_four_hours_ago = datetime.now() - timedelta(days=5)
     response = articles.get_articles_since(twenty_four_hours_ago)
