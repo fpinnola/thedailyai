@@ -31,7 +31,10 @@ def handle_get_audio():
 
 @app.route('/news/refresh', methods=['GET'])
 def handle_update_news():
-    update_news_articles()
+    from threading import Thread
+    thread = Thread(target = update_news_articles)
+
+    thread.start()
     return "Began"
 
 if __name__ == '__main__':
