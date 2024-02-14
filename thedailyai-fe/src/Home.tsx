@@ -8,20 +8,7 @@ export default function Home() {
 
     const [articles, setArticles] = useState<any[]>([]);
 
-    // const [podcastAudioURL, setPodcastAudioURL] = useState('');
-
-    // const [podcastScript, setPodcastScript] = useState('');
-
-    // const fetchDailyPodcast = async (preferences: any) => {
-    //     console.log(`Sending preferences: ${JSON.stringify(preferences)}`);
-        
-    //     let podcastURL: string = await getPodcast(preferences);
-    //     console.log(`Got podcastURL: ${podcastURL}`);
-    //     setPodcastAudioURL(podcastURL);
-    // }
-
     useEffect(() => {
-        // TODO: get articles from backend
         const wrapper = async () => {
             let prefString = localStorage.getItem('preferences');
             if (!prefString) return;
@@ -30,7 +17,6 @@ export default function Home() {
             let news: any[] = await getNews(preferences);
             console.log(`${news.length} articles`)
             setArticles(news);
-            // fetchDailyPodcast(preferences);
         }
 
         wrapper();

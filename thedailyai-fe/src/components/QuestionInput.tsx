@@ -4,8 +4,6 @@ export default function QuestionInput() {
         <div className="searchInputContainer">
             <input
             type="text"
-            // value={inputValue}
-            // onChange={handleInputChange}
             className="searchInput"
             placeholder="Ask a question..."
             />
