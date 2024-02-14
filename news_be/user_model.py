@@ -1,4 +1,7 @@
 from datetime import datetime
+
+import bcrypt
+
 from utils import is_within_n_hours
 
 def is_same_day_as_today(date_to_check):
@@ -21,15 +24,64 @@ class UserModel:
             print(f"User {userId} not found")
             return None
         return user
+    
+    def user_to_json(self, user):
+        return {
+            "userId": user["userId"],
+            "preferences": user['preferences']
+        }
+    
+    def create_user(self, username, password):
+         # Check if the user already exists
+        if self.users.find_one({"userId": username}):
+            return {"error": "Username already exists"}
+        
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Insert new user into the database
+        result = self.users.insert_one({
+            "userId": username,
+            "password": hashed  # In a real application, make sure to hash this before storing
+        })
+
+        # Retrieve the new user to return as JSON
+        new_user = self.users.find_one({"_id": result.inserted_id})
+
+        return self.user_to_json(new_user)
+
+    def validate_user(self, username, password):
+        # Find the user in the database by username
+        user = self.users.find_one({"userId": username})
+
+        if not user:
+            # User not found
+            return {"error": "Invalid username or password"}
+
+        # Check if the password is correct
+        hashed = user['password']
+        if bcrypt.checkpw(password, hashed):
+            # Password is correct
+            return {"message": "User validated successfully"}
+        else:
+            # Password is incorrect
+            return {"error": "Invalid username or password"}
 
     def save_user_preferences(self, userId, preferences):
+
+        print(f"updating {userId} with {preferences}")
+        user = self.get_user(userId)
+
+        if not user:
+            return {"error": "user not found"}
+
         new_user = self.users.update_one({
             'userId': userId
         }, {
             '$set': { 'preferences': preferences }
-        }, upsert=True)
+        }, upsert=False)
 
-        return new_user
+        return self.user_to_json(self.get_user(userId))
+
 
     def update_user_articles(self, userId, articles):
         print(f"upatading user {userId} with {len(articles)} articles")

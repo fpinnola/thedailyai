@@ -128,7 +128,14 @@ def get_articles_from_hackernews(categories, n=10):
     print(N)
     return selected_elements
 
+def create_user(username, password):
+    return users.create_user(username, password)
     
+def validate_user(username, password):
+    return users.validate_user(username, password)
+
+def update_user_prefs(userId, prefs):
+    return users.save_user_preferences(userId, prefs)
 
 '''
     Returns n latest articles given categories
