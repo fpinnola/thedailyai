@@ -62,22 +62,9 @@ export default function Home() {
                 }}>Your News for {getDate()}</h4>
             </div>
 
-            {/* {!podcastAudioURL.length ? null : (
-                <div>
-                    <h4>Your daily podcast</h4>
-                    <audio controls>
-                        <source src={podcastAudioURL} type="audio/mpeg" />
-                    </audio>
-                </div>
-            )} */}
             <div className="slider-container">
                 {articles.map((elem, index) => (
-                    <StoryCard key={elem.title + index} title={elem.title} summary={elem.summary} />
-                    // <div>
-                    //     <h4>{elem.title}</h4>
-                    //     <p>{elem.summary}</p>
-                    //     <a href={elem.url}>Read more</a>
-                    // </div>
+                    <StoryCard key={elem.title + index} title={elem.title} summary={elem.summary} url={elem.url} />
                 ) )}
             </div>
         </>
