@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, signupUser } from "./external/news_be.external";
+import loading from "./assets/loading.gif"
 
 const newsCategories: string[] = ["economy", "business", "technology", "biotech", "healthcare", "politics", "law", "government", "crime", "weather"];
 const summaryDetailOptions: string[] = ["High-Level Overview", "Moderately Detailed", "Very Detailed"];
@@ -54,6 +55,7 @@ export default function Onboard() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSignup = async (event: any) => {
         event.preventDefault();
@@ -65,25 +67,25 @@ export default function Onboard() {
         }
     
         // Construct the request payload
-    
+        setIsLoading(true);
         try {
-          const response = await signupUser(email, password);
+            const response = await signupUser(email, password);
 
-        //   console.log('User created:', JSON.stringify(response));
-          setErrorMessage('');
-          localStorage.setItem('user', JSON.stringify(response));
+            setErrorMessage('');
+            localStorage.setItem('user', JSON.stringify(response));
 
-          // Get Auth token
-          const response2: any = await login(email, password);
+            // Get Auth token
+            const response2: any = await login(email, password);
 
-          const token = response2.access_token;
-          localStorage.setItem('access_token', JSON.stringify(token));
-          
-          setPage(page + 1);
-    
+            const token = response2.access_token;
+            localStorage.setItem('access_token', JSON.stringify(token));
+            setIsLoading(false);
+            setPage(page + 1);
+
         } catch (error: any) {
             console.log(`Error: ${error}`);
             setErrorMessage(error.message);
+            setIsLoading(false);
         }
       };
     
@@ -95,13 +97,12 @@ export default function Onboard() {
                     <h2>Welcome to TheDaily. Create an account for free to get started</h2>
 
                     <div>
-                        {/* <h4>Email</h4>
-                        <input placeholder="Enter your email address"/>
-                        <h4>Password</h4>
-                        <input placeholder="Enter your email address"/>
-                        <h4>Confirm Password</h4>
-                        <input placeholder="Enter your email address"/>
-                        <button className="bubble-button">Continue</button> */}
+                        {isLoading && (
+                                    <img style={{
+                                        height: 24, 
+                                        width: 24
+                                    }} src={loading} alt="Loading..." />
+                        )}
                         <form className="signup-form-container" onSubmit={handleSignup}>
                             <div className="signup-input-container">
                                 <label style={{ textAlign: 'left'}}>Email</label>
@@ -138,7 +139,7 @@ export default function Onboard() {
                             </div>
                             {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
                             <div>
-                                <button className="bubble-button" type="submit">Continue</button>
+                                <button disabled={isLoading} className="bubble-button" type="submit">Continue</button>
                             </div>
                         </form>
                     </div>

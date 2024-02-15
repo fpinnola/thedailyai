@@ -46,7 +46,19 @@ h1 {
   color: white;
   background-color: #79B464;
   cursor: pointer;
-  transition: border-color 0.25s;
+  /* transition: border-color 0.25s; */
+  transition: background-color 0.3s ease;
+}
+
+.bubble-button:active {
+  /* Color when the button is pressed */
+  background-color: #bfe5b1;
+}
+
+.bubble-button.disabled,
+.bubble-button:disabled {
+  background-color: #a9a9a9;
+  cursor: not-allowed;
 }
 
 .text-button {
