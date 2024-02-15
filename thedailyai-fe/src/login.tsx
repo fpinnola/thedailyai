@@ -34,7 +34,7 @@ export default function Login() {
     return (
         <>
             <div>
-                <h2>Welcome to TheDaily. Create an account for free to get started</h2>
+                <h2>Login to TheDaily</h2>
                 <div>
                     {isLoading && (
                         <img style={{
