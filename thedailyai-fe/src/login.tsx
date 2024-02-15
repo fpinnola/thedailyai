@@ -37,10 +37,10 @@ export default function Login() {
                 <h2>Welcome to TheDaily. Create an account for free to get started</h2>
                 <div>
                     {isLoading && (
-                                <img style={{
-                                    height: 24, 
-                                    width: 24
-                                }} src={loading} alt="Loading..." />
+                        <img style={{
+                            height: 24, 
+                            width: 24
+                        }} src={loading} alt="Loading..." />
                     )}
                     <form className="signup-form-container" onSubmit={handleLogin}>
                         <div className="signup-input-container">

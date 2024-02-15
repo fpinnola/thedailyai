@@ -98,10 +98,10 @@ export default function Onboard() {
 
                     <div>
                         {isLoading && (
-                                    <img style={{
-                                        height: 24, 
-                                        width: 24
-                                    }} src={loading} alt="Loading..." />
+                            <img style={{
+                                height: 24, 
+                                width: 24
+                            }} src={loading} alt="Loading..." />
                         )}
                         <form className="signup-form-container" onSubmit={handleSignup}>
                             <div className="signup-input-container">
