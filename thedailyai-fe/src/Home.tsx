@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getNews } from "./external/news_be.external";
 import StoryCard from "./components/StoryCard";
 import loading from "./assets/loading.gif"
+import { useNavigate } from "react-router-dom";
 
 const USER_ID_TEST = 'frank123';
 
@@ -26,6 +27,7 @@ const newsLoadingMessages = [
 
 export default function Home() {
 
+    const navigate = useNavigate();
     const [articles, setArticles] = useState<any[]>([]);
     const [loadingNews, setLoadingNews] = useState(false);
     const [loadingMessage] = useState( newsLoadingMessages[Math.floor(Math.random() * newsLoadingMessages.length)]);
@@ -37,10 +39,18 @@ export default function Home() {
             const preferences = JSON.parse(prefString)
             preferences.userId = USER_ID_TEST;
             setLoadingNews(true);
-            let news: any[] = await getNews(preferences);
-            setLoadingNews(false);
-            console.log(`${news.length} articles`)
-            setArticles(news);
+            try {
+                let news: any[] = await getNews(preferences);
+                setLoadingNews(false);
+                console.log(`${news.length} articles`)
+                setArticles(news);
+
+            } catch (err: any) {
+                localStorage.removeItem('access_token');
+                setLoadingNews(false);
+                navigate('/login');
+            }
+
         }
 
         wrapper();

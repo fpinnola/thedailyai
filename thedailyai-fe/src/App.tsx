@@ -1,8 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import './App.css'
+import { useEffect } from 'react';
 
 function App() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
 
   return (
     <>

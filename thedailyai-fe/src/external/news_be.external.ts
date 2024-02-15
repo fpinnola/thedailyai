@@ -7,7 +7,7 @@ export async function getNews(preferences: any): Promise<any[]> {
     let reqURL = baseURL + '/getNews';
     console.log(`preferences: ${JSON.stringify(preferences)}`);
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         const token = localStorage.getItem('access_token');
         if (!token) {
             // TODO: Send user to login!
@@ -21,7 +21,10 @@ export async function getNews(preferences: any): Promise<any[]> {
         })
         .catch((err) => {
             console.log(`Error getting news: ${JSON.stringify(err)}`);
-            resolve([]);
+            if (err.status === 403) {
+                reject("unauthorized");
+            }
+            reject("failed");
         });
     })
 }
