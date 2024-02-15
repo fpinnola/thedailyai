@@ -28,7 +28,7 @@ class UserModel:
     def user_to_json(self, user):
         return {
             "userId": user["userId"],
-            "preferences": user['preferences']
+            "preferences": user.get('preferences', {})
         }
     
     def create_user(self, username, password):
