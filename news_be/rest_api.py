@@ -4,7 +4,7 @@ from flask_cors import CORS
 from main import get_news_from_params, get_user_podcast, update_news_articles
 from main import create_user, validate_user, update_user_prefs
 import os
-
+from datetime import timedelta
 app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'NONE')
@@ -23,7 +23,7 @@ def login():
     if 'error' in res:
         return jsonify(res), 401
 
-    access_token = create_access_token(identity=username)
+    access_token = create_access_token(identity=username, expires_delta=timedelta(hours=24))
     return jsonify(access_token=access_token)
 
 @app.route('/signup', methods=['POST'])
