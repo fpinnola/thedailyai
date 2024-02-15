@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login, signupUser } from "./external/news_be.external";
 
 const newsCategories: string[] = ["economy", "business", "technology", "biotech", "healthcare", "politics", "law", "government", "crime", "weather"];
 const summaryDetailOptions: string[] = ["High-Level Overview", "Moderately Detailed", "Very Detailed"];
-const newsStyleOptions: string[] = ["Newscaster", "Humorous", "Serious", "Relaxed"];
+// const newsStyleOptions: string[] = ["Newscaster", "Humorous", "Serious", "Relaxed"];
 const PAGES = 3;
 
 
@@ -11,7 +12,7 @@ export default function Onboard() {
     const navigate = useNavigate();
     const [categorySelections, setCategorySelections] = useState<any[]>([]);
     const [summaryDetail, setSummaryDetail] = useState<string>('');
-    const [selectedNewsStyle, setSelectedNewsStyle] = useState<string>('');
+    // const [selectedNewsStyle, setSelectedNewsStyle] = useState<string>('');
     const [page, setPage] = useState(0);
 
     useEffect(() => {
@@ -39,7 +40,7 @@ export default function Onboard() {
             const preferences = {
                 categories: categorySelections.filter((elem) => elem.selected).map(elem => elem.name),
                 summaryDetail: summaryDetail,
-                style: selectedNewsStyle
+                // style: selectedNewsStyle
             };
             localStorage.setItem('preferences', JSON.stringify(preferences));
             navigate("/home");
@@ -49,7 +50,103 @@ export default function Onboard() {
         setPage(page + 1);
     }
 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleSignup = async (event: any) => {
+        event.preventDefault();
+        
+        // Check if passwords match
+        if (password !== confirmPassword) {
+          setErrorMessage('Passwords do not match.');
+          return;
+        }
+    
+        // Construct the request payload
+    
+        try {
+          const response = await signupUser(email, password);
+
+        //   console.log('User created:', JSON.stringify(response));
+          setErrorMessage('');
+          localStorage.setItem('user', JSON.stringify(response));
+
+          // Get Auth token
+          const response2: any = await login(email, password);
+
+          const token = response2.access_token;
+          localStorage.setItem('access_token', JSON.stringify(token));
+          
+          setPage(page + 1);
+    
+        } catch (error: any) {
+            console.log(`Error: ${error}`);
+            setErrorMessage(error.message);
+        }
+      };
+    
+
     if (page === 0) {
+        return (
+            <>
+                <div>
+                    <h2>Welcome to TheDaily. Create an account for free to get started</h2>
+
+                    <div>
+                        {/* <h4>Email</h4>
+                        <input placeholder="Enter your email address"/>
+                        <h4>Password</h4>
+                        <input placeholder="Enter your email address"/>
+                        <h4>Confirm Password</h4>
+                        <input placeholder="Enter your email address"/>
+                        <button className="bubble-button">Continue</button> */}
+                        <form className="signup-form-container" onSubmit={handleSignup}>
+                            <div className="signup-input-container">
+                                <label style={{ textAlign: 'left'}}>Email</label>
+                                <input
+                                    className="signup-input"
+                                    type="email"
+                                    placeholder="Email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="signup-input-container">
+                                <label style={{ textAlign: 'left'}}>Password</label>
+                                <input
+                                    className="signup-input"
+                                    type="password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="signup-input-container">
+                                <label style={{ textAlign: 'left'}}>Confirm Password</label>
+                                <input
+                                    type="password"
+                                    className="signup-input"
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+                            <div>
+                                <button className="bubble-button" type="submit">Continue</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </>
+        )
+    }
+    else if (page === 1) {
         return (
             <>
                 <div>
@@ -57,27 +154,11 @@ export default function Onboard() {
                     <div>
                         {categorySelections.map(elem => {
                             return (
-                                <button key={elem.name} className={elem.selected ? "selected" : "unselected"} onClick={() => selectedCategory(elem.name)}>{elem.name}</button>
+                                <button key={elem.name} className={"bubble-button " + (elem.selected ? "selected" : "unselected")} onClick={() => selectedCategory(elem.name)}>{elem.name}</button>
                             )
                         })}
                     </div>
-                    <button onClick={continueBtn}>Continue</button>
-                </div>
-            </>
-        )
-    } else if (page === 1) {
-        return (
-            <>
-                <div>
-                    <h2>How detailed would you like your news summaries to be?</h2>
-                    <div>
-                        {summaryDetailOptions.map(elem => {
-                            return (
-                                <button key={elem} className={elem === summaryDetail ? "selected" : "unselected"} onClick={() => setSummaryDetail(elem)}>{elem}</button>
-                            )
-                        })}
-                    </div>
-                    <button disabled={!summaryDetail.length} onClick={continueBtn}>Continue</button>
+                    <button className="bubble-button" onClick={continueBtn}>Continue</button>
                 </div>
             </>
         )
@@ -85,15 +166,15 @@ export default function Onboard() {
         return (
             <>
                 <div>
-                    <h2>What style would you like your news to be delivered in?</h2>
+                    <h2>How detailed would you like your news summaries to be?</h2>
                     <div>
-                        {newsStyleOptions.map(elem => {
+                        {summaryDetailOptions.map(elem => {
                             return (
-                                <button key={elem} className={selectedNewsStyle === elem ? "selected" : "unselected"} onClick={() => setSelectedNewsStyle(elem)}>{elem}</button>
+                                <button key={elem} className={"bubble-button " + (elem === summaryDetail ? "selected" : "unselected")} onClick={() => setSummaryDetail(elem)}>{elem}</button>
                             )
                         })}
                     </div>
-                    <button disabled={!selectedNewsStyle.length} onClick={continueBtn}>Continue</button>
+                    <button className="bubble-button" disabled={!summaryDetail.length} onClick={continueBtn}>Continue</button>
                 </div>
             </>
         )

@@ -7,7 +7,7 @@ export default function QuestionInput() {
             className="searchInput"
             placeholder="Ask a question..."
             />
-            <button className="searchButton">
+            <button className="bubble-button searchButton">
             Go
             </button>
         </div>

@@ -49,3 +49,25 @@
   border-radius: 5px 5px 5px 5px; /* Align the radius with the container */
   margin: none;
 }
+
+.signup-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.signup-input-container {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0rem;
+  width: 30ch;
+  justify-content: left;
+}
+
+.signup-input {
+  border: none;
+  font-size: large;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}

@@ -39,14 +39,14 @@ const PagedTextViewer = ({ text, charsPerPage = 500 }: { text: string, charsPerP
       <div style={{ whiteSpace: 'pre-wrap' }}>{pages[currentPage]}</div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
         {currentPage > 0 ? (
-          <button style={{
+          <button className='bubble-button' style={{
             backgroundColor: '#afafaf'
           }} onClick={prevPage}>&lt;</button>
         ) : (
           <div></div> // Empty div for spacing when there's no '<' button
         )}
         <div style={{ marginLeft: 'auto' }}> {/* This ensures '>' is always on the right */}
-          {currentPage < pages.length - 1 && <button style={{
+          {currentPage < pages.length - 1 && <button className='bubble-button' style={{
             backgroundColor: '#afafaf'
           }} onClick={nextPage}>&gt;</button>}
         </div>
