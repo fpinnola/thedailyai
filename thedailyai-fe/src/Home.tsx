@@ -34,8 +34,8 @@ export default function Home() {
 
     useEffect(() => {
         const wrapper = async () => {
-            let prefString = localStorage.getItem('preferences');
-            if (!prefString) return;
+            let prefString = localStorage.getItem('preferences') || '{"categories": ["none"]}';
+            // if (!prefString) return;
             const preferences = JSON.parse(prefString)
             preferences.userId = USER_ID_TEST;
             setLoadingNews(true);
@@ -46,6 +46,7 @@ export default function Home() {
                 setArticles(news);
 
             } catch (err: any) {
+                console.log(`Error: ${err}`)
                 localStorage.removeItem('access_token');
                 setLoadingNews(false);
                 navigate('/login');

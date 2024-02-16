@@ -11,8 +11,8 @@ export async function getNews(preferences: any): Promise<any[]> {
         const token = localStorage.getItem('access_token');
         if (!token) {
             // TODO: Send user to login!
-            console.log(`Error: user token on longer valid`);
-            resolve([]);
+            console.log(`Error: user token no longer valid`);
+            reject("failed");
             return;
         }
         axios.post(reqURL, preferences, {headers: { Authorization: `Bearer ${JSON.parse(token)}` }})
@@ -77,6 +77,10 @@ export async function login(email: string, password: string): Promise<object> {
         })
         .then((res) => {
             console.log(`Received data: ${JSON.stringify(res.data)}`)
+            const { access_token, refresh_token } = res.data;
+            localStorage.setItem('access_token', JSON.stringify(access_token));
+            localStorage.setItem('refresh_token', JSON.stringify(refresh_token));
+
             resolve(res.data);
         })
         .catch((err) => {
@@ -84,4 +88,47 @@ export async function login(email: string, password: string): Promise<object> {
             reject(err);
         });
     })
+}
+
+async function refreshToken() {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) {
+        throw new Error('No refresh token available');
+    }
+    try {
+        const response = await axios.post(`${baseURL}/token/refresh`, {}, {
+            headers: { Authorization: `Bearer ${JSON.parse(refreshToken)}`}
+        });
+        const { access_token } = response.data;
+        localStorage.setItem('access_token', JSON.stringify(access_token));
+        return access_token;
+    } catch (err) {
+        console.error(`Error refreshing token:`, err);
+        throw err;
+    }
+}
+
+export function setupAxiosInterceptors() {
+    axios.interceptors.response.use(
+        response => response, // Return the response if it's successful without changes
+        async error => {
+          const originalRequest = error.config;
+          if (error.response.status === 401 && !originalRequest._retry) {
+            // Mark this request as already tried
+            originalRequest._retry = true;
+            try {
+              // Attempt to get a new token
+              console.log("Refreshing token");
+              const newAccessToken = await refreshToken();
+              console.log(`New Access token: ${newAccessToken}`)
+              // Update the authorization header and retry the original request
+              originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+              return axios(originalRequest);
+            } catch (refreshError) {
+              return Promise.reject(refreshError);
+            }
+          }
+          return Promise.reject(error);
+        }
+      );
 }

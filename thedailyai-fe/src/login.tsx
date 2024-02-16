@@ -17,10 +17,7 @@ export default function Login() {
 
         try {
             // Get Auth token
-            const response: any = await login(email, password);
-
-            const token = response.access_token;
-            localStorage.setItem('access_token', JSON.stringify(token));
+            await login(email, password);
             setIsLoading(false);
             navigate("/home");
         

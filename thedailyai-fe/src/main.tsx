@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Onboard from './Onboard.tsx'
 import Home from './Home.tsx'
 import Login from './login.tsx'
+import { setupAxiosInterceptors } from './external/news_be.external.ts'
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,8 @@ const router = createBrowserRouter([
     element: <Login />
   }
 ])
+
+setupAxiosInterceptors();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
