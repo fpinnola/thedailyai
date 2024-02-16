@@ -223,7 +223,7 @@ def summarize_article(article):
         completion = client.chat.completions.create(
                 model="gpt-3.5-turbo-1106",
                 messages=[
-                    {"role": "system", "content": f"Summarize the following article in the style of a news broadcast. Retain important facts and key ideas presented. Only provide your summary and no extra message. Keep your summary concise, less than 200 words. Output your resposnse as a json object with two properties, 'summary' which is the summary, and 'category' which is  one of the following 'technology', 'software', 'biotech', 'politics', or 'other'."},
+                    {"role": "system", "content": f"Rewrite the following article. Retain important facts and key ideas presented. Only provide your summary and no extra message. Keep your summary concise, less than 200 words. Output your resposnse as a json object with two properties, 'summary' which is the rewrite, and 'category' which is  one of the following 'technology', 'business', 'politics', 'legal', 'general' or 'other'."},
                     {"role": "user", "content": f"{article['body']}"}
                 ],
                 max_tokens=300,
