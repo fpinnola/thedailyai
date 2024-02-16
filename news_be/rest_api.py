@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 from flask_cors import CORS
 from main import get_news_from_params, get_user_podcast, update_news_articles
 from main import create_user, validate_user, update_user_prefs
@@ -8,8 +8,20 @@ from datetime import timedelta
 app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'NONE')
+
 jwt = JWTManager(app)
 CORS(app)
+
+
+@app.route('/token/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    current_user = get_jwt_identity()
+    # TODO: Invalidate old refresh token
+
+    # TODO: issue and store new refresh token
+    new_token = create_access_token(identity=current_user, expires_delta=timedelta(hours=24))
+    return jsonify({'access_token': new_token})
 
 
 @app.route('/login', methods=['POST'])
@@ -24,7 +36,10 @@ def login():
         return jsonify(res), 401
 
     access_token = create_access_token(identity=username, expires_delta=timedelta(hours=24))
-    return jsonify(access_token=access_token)
+
+    # TODO: store refresh token
+    refresh_token = create_refresh_token(identity=username)
+    return jsonify({'access_token': access_token, 'refresh_token': refresh_token})
 
 @app.route('/signup', methods=['POST'])
 def signup():
