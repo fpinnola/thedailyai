@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login, signupUser } from "./external/news_be.external";
+import { login, signupUser, updateUserPreferences } from "./external/news_be.external";
 import loading from "./assets/loading.gif"
 
 const newsCategories: string[] = ["economy", "business", "technology", "biotech", "healthcare", "politics", "law", "government", "crime", "weather"];
@@ -35,7 +35,7 @@ export default function Onboard() {
 
     
 
-    const continueBtn = () => {
+    const continueBtn = async () => {
         if (page + 1 >= PAGES) {
             // DONE, navigate to home
             const preferences = {
@@ -43,6 +43,7 @@ export default function Onboard() {
                 summaryDetail: summaryDetail,
                 // style: selectedNewsStyle
             };
+            await updateUserPreferences(preferences);
             localStorage.setItem('preferences', JSON.stringify(preferences));
             navigate("/home");
             return;

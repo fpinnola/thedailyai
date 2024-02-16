@@ -36,7 +36,7 @@ export default function Home() {
         const wrapper = async () => {
             let prefString = localStorage.getItem('preferences') || '{"categories": ["none"]}';
             // if (!prefString) return;
-            const preferences = JSON.parse(prefString)
+            const preferences = JSON.parse(prefString);
             preferences.userId = USER_ID_TEST;
             setLoadingNews(true);
             try {

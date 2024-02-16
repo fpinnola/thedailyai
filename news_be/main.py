@@ -287,7 +287,7 @@ def get_news_from_params(params, n=10):
     articles = []
 
     user_artices = users.get_user_articles(userId)
-    if not user_artices:
+    if user_artices is None:
         # User doesn't exist, create
         users.save_user_preferences(userId, {})
         user_artices = []
