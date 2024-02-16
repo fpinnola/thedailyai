@@ -1,8 +1,11 @@
 import requests
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
+from article_extractor import get_article_info
 
-def fetch_news(access_key, keywords=None, countries=None, categories=None, limit=100, offset=0, within_days=1):
+ACCESS_KEY = os.getenv('MEDIASTACK_API_KEY', '')
+
+def fetch_news(keywords=None, countries=None, categories=None, limit=100, offset=0, within_days=1):
     base_url = "http://api.mediastack.com/v1/news"
 
 
@@ -11,7 +14,7 @@ def fetch_news(access_key, keywords=None, countries=None, categories=None, limit
     today_str = datetime.now().strftime('%Y-%m-%d')
 
     params = {
-        "access_key": access_key,
+        "access_key": ACCESS_KEY,
         "limit": limit,
         "date": f"{start_date_str},{today_str}"
     }
@@ -25,8 +28,6 @@ def fetch_news(access_key, keywords=None, countries=None, categories=None, limit
         params["categories"] = categories
     if offset != 0:
         params["offset"] = offset
-
-    print(f"params: {params}")
     
     try:
         response = requests.get(base_url, params=params)
@@ -36,16 +37,17 @@ def fetch_news(access_key, keywords=None, countries=None, categories=None, limit
         print(f"An error occurred: {e}")
         return None
 
-
-if __name__ == "__main__":
-    # Example usage
-    access_key = os.getenv('MEDIASTACK_API_KEY', '')  # Replace YOUR_ACCESS_KEY with your actual access key
-
-    # You can now call the function with or without the optional parameters
-    # news_data = fetch_news(access_key, keywords="tennis", countries="us,gb,de")
-    news_data = fetch_news(access_key, categories="technology", countries="us")
-    print(news_data)
-
-    # Example calling the function without keywords and countries
-    # news_data_no_params = fetch_news(access_key)
-    # print(news_data_no_params)
+def get_new_articles():
+    response = fetch_news(categories="technology, business", limit=15)
+    articles = []
+    for article in response['data']:
+        external_id = 'ms' + article['url']
+        article_info = get_article_info(article['url'])
+        if not article_info or not ('date' in article_info) or not article_info['date']:
+                continue
+        date_to_compare = datetime.strptime(article_info['date'], "%Y-%m-%d").date()
+        article_info['date'] = datetime.combine(date_to_compare, time.min)
+        article_info['url'] = article['url']
+        article_info['externalId'] = external_id
+        articles.append(article_info)
+    return articles

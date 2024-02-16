@@ -6,16 +6,15 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from eventregistry import *
 from user_model import UserModel
-import concurrent.futures
 from gtts import gTTS
 import boto3
 from datetime import datetime, timedelta, date
 from pymongo import MongoClient
 from sources_model import SourcesModel
 from article_model import ArticleModel
-from bson import json_util
 
 from utils import is_within_n_hours
+from sources import mediastacksource
 
 
 # Load environment variables from .env
@@ -86,18 +85,19 @@ def is_within_n_days(input_date, n_days):
 
 
 def update_news_articles():
-    # Check if new scrape needed
+    # TODO: add lock so multiple simultaneous runs not possible
+    
+    
+    # Hackernews
     last_scrape = scrape_sources.time_since_scrape("hackernews")
     if not last_scrape or not is_within_n_hours(last_scrape, 8):
-        # TODO: add lock so multiple simultaneous runs not possible
 
         # Need to update articles with latest from hackernews
         new_articles = get_best_articles(max_articles=15, within_days=5)
-        print(f"got {len(new_articles)} new articles")
+        print(f"got {len(new_articles)} new articles from hackernews")
         
         # Store new articles in db
         for article in new_articles:
-            # TODO: categorize and summarize articles
             article['body'] = article['raw_text']
             summarize_article(article)
             article_id = str(uuid.uuid4())
@@ -111,6 +111,24 @@ def update_news_articles():
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("hackernews", datetime.now())
 
+    # Mediastack
+    last_scrape = scrape_sources.time_since_scrape("mediastack")
+    if not last_scrape or not is_within_n_hours(last_scrape, 24):
+        new_articles = mediastacksource.get_new_articles()
+        print(f"got {len(new_articles)} new aritcles from mediastack")
+        for article in new_articles:
+            article['body'] = article['raw_text']
+            summarize_article(article)
+            article_id = str(uuid.uuid4())
+            if not 'externalId' in article:
+                article['externalId'] = None
+            if (not 'summary' in article) or (not 'category' in article):
+                print(f"Issue getting summary or cateogry for article {article['title']}")
+                continue
+            articles.save_article(article_id, article['title'], article['raw_text'], article['summary'], article['url'], article['category'], article['date'], article['externalId'])
+
+        # Update scrape sources to prevent future scrapes
+        scrape_sources.update_since_scrape("mediastack", datetime.now())
 
 def get_articles_from_hackernews(categories, n=10):
     print(f"Requesting {n} articles from hackernews")
