@@ -23,14 +23,14 @@ load_dotenv()
 
 
 # Load env variables
-NEWS_API_KEY = os.getenv('NEWS_API_KEY')
+# NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_ACCESS_KEY_SECRET = os.getenv('AWS_ACCESS_KEY_SECRET')
 AWS_REGION = os.getenv('AWS_REGION')
 AWS_BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
 MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 
-er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
+# er = EventRegistry(apiKey = NEWS_API_KEY, allowUseOfArchive=False)
 client = OpenAI()
 db_client = MongoClient(f"mongodb+srv://fpinnola:{MONGO_PASSWORD}@cluster0.9bnvnxh.mongodb.net/?retryWrites=true&w=majority", 27017)
 users = UserModel(db_client)
@@ -163,32 +163,32 @@ def update_user_prefs(userId, prefs):
         categories: list of strings
         n: max articles to return (default 5)
 '''
-def get_articles_from_api(categories, n=10):
-    print(f"Requesting {n} articles from external API")
-    if not n:
-        # Requesting 0 articles
-        return []
+# def get_articles_from_api(categories, n=10):
+#     print(f"Requesting {n} articles from external API")
+#     if not n:
+#         # Requesting 0 articles
+#         return []
 
-    ri = ReturnInfo(ArticleInfoFlags(categories=True))
+#     ri = ReturnInfo(ArticleInfoFlags(categories=True))
 
-    q = QueryArticlesIter(
-        categoryUri= QueryItems.OR([f"{er.getCategoryUri(cat)}" for cat in categories]),
-        lang='eng',
-        startSourceRankPercentile=0,
-        endSourceRankPercentile=10,
-        dataType="news"
-    )
+#     q = QueryArticlesIter(
+#         categoryUri= QueryItems.OR([f"{er.getCategoryUri(cat)}" for cat in categories]),
+#         lang='eng',
+#         startSourceRankPercentile=0,
+#         endSourceRankPercentile=10,
+#         dataType="news"
+#     )
 
-    articles = []
-    for art in q.execQuery(er, sortBy = "date", maxItems=n, returnInfo=ri):
-        articles.append({
-            'title': art['title'],
-            'body': art['body'],
-            'uri': art['uri'],
-            'meta': {k: v for k, v in art.items() if k not in ['body', 'title', 'url']}
-        })
+#     articles = []
+#     for art in q.execQuery(er, sortBy = "date", maxItems=n, returnInfo=ri):
+#         articles.append({
+#             'title': art['title'],
+#             'body': art['body'],
+#             'uri': art['uri'],
+#             'meta': {k: v for k, v in art.items() if k not in ['body', 'title', 'url']}
+#         })
     
-    return articles
+#     return articles
 
     
 '''

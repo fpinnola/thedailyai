@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
@@ -7,6 +8,9 @@ from main import get_news_from_params, get_user_podcast, update_news_articles
 from main import create_user, validate_user, update_user_prefs
 import os
 from datetime import timedelta
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'NONE')
@@ -104,12 +108,14 @@ def handle_get_audio():
 
     return jsonify(response_obj)
 
+from threading import Thread
 @app.route('/news/refresh', methods=['GET'])
 def handle_update_news():
-    from threading import Thread
-    thread = Thread(target = update_news_articles)
     logging.info("Starting refresh of news")
-
+    def update_with_context():
+        with app.app_context():
+            update_news_articles()
+    thread = Thread(target = update_with_context)
     thread.start()
     return "Began"
 
