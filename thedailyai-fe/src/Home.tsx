@@ -73,7 +73,7 @@ export default function Home() {
         <>
             <div style={{
                 position: 'absolute',
-                top: 50,
+                top: 0,
                 width: '100%',
                 left: 0
             }}>

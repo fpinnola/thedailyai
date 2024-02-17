@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import ArrowRight from '../assets/ArrowRight.png';
+import ArrowLeft from '../assets/ArrowLeft.png';
+
+
 
 const PagedTextViewer = ({ text, charsPerPage = 500 }: { text: string, charsPerPage?: number }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -40,15 +44,25 @@ const PagedTextViewer = ({ text, charsPerPage = 500 }: { text: string, charsPerP
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
         {currentPage > 0 ? (
           <button className='bubble-button' style={{
-            backgroundColor: '#afafaf'
-          }} onClick={prevPage}>&lt;</button>
+            backgroundColor: 'transparent'
+          }} onClick={prevPage}>            
+          <img style={{
+            height: 24,
+            width: 24
+          }} src={ArrowLeft} />
+          </button>
         ) : (
           <div></div> // Empty div for spacing when there's no '<' button
         )}
         <div style={{ marginLeft: 'auto' }}> {/* This ensures '>' is always on the right */}
           {currentPage < pages.length - 1 && <button className='bubble-button' style={{
-            backgroundColor: '#afafaf'
-          }} onClick={nextPage}>&gt;</button>}
+            backgroundColor: 'transparent'
+          }} onClick={nextPage}>
+            <img style={{
+              height: 24,
+              width: 24
+            }} src={ArrowRight} />
+            </button>}
         </div>
       </div>
     </div>
