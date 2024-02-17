@@ -1,6 +1,7 @@
 import os
 import uuid
 import random
+import logging
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -88,8 +89,7 @@ def update_news_articles():
     # TODO: add lock so multiple simultaneous runs not possible
     
     # Hackernews
-    print("Updating hackernews news articles")
-
+    logging.info("Updating hackernews news articles")
     last_scrape = scrape_sources.time_since_scrape("hackernews")
     if not last_scrape or not is_within_n_hours(last_scrape, 8):
         # Need to update articles with latest from hackernews
@@ -113,8 +113,7 @@ def update_news_articles():
 
 
     # Mediastack
-    print("Updating mediastack articles")
-
+    logging.info("Updating mediastack articles")
     last_scrape = scrape_sources.time_since_scrape("mediastack")
     if not last_scrape or not is_within_n_hours(last_scrape, 24):
         new_articles = mediastacksource.get_new_articles()

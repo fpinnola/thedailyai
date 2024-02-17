@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 from flask_cors import CORS
@@ -106,6 +108,7 @@ def handle_get_audio():
 def handle_update_news():
     from threading import Thread
     thread = Thread(target = update_news_articles)
+    logging.info("Starting refresh of news")
 
     thread.start()
     return "Began"
