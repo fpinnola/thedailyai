@@ -87,11 +87,11 @@ def is_within_n_days(input_date, n_days):
 def update_news_articles():
     # TODO: add lock so multiple simultaneous runs not possible
     
-    
     # Hackernews
+    print("Updating hackernews news articles")
+
     last_scrape = scrape_sources.time_since_scrape("hackernews")
     if not last_scrape or not is_within_n_hours(last_scrape, 8):
-
         # Need to update articles with latest from hackernews
         new_articles = get_best_articles(max_articles=15, within_days=5)
         print(f"got {len(new_articles)} new articles from hackernews")
@@ -111,7 +111,10 @@ def update_news_articles():
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("hackernews", datetime.now())
 
+
     # Mediastack
+    print("Updating mediastack articles")
+
     last_scrape = scrape_sources.time_since_scrape("mediastack")
     if not last_scrape or not is_within_n_hours(last_scrape, 24):
         new_articles = mediastacksource.get_new_articles()
