@@ -12,6 +12,7 @@ def fetch_news(keywords=None, countries=None, categories=None, limit=100, offset
     start_date = datetime.now() - timedelta(days=within_days)
     start_date_str = start_date.strftime('%Y-%m-%d')
     today_str = datetime.now().strftime('%Y-%m-%d')
+    print(f"Searching for articles between {start_date_str},{today_str}")
 
     params = {
         "access_key": ACCESS_KEY,
@@ -39,7 +40,7 @@ def fetch_news(keywords=None, countries=None, categories=None, limit=100, offset
         return None
 
 def get_new_articles():
-    response = fetch_news(categories="technology, business", limit=15)
+    response = fetch_news(categories="technology, business", limit=15, countries="us")
     articles = []
     for article in response['data']:
         external_id = 'ms' + article['url']
