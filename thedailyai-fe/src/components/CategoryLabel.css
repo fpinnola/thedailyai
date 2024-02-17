@@ -1,0 +1,10 @@
+.category-label {
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
+    color: white; /* White text color */
+    padding: 8px 16px; /* Top and bottom padding of 8px, left and right padding of 16px */
+    border-radius: 20px; /* Rounded corners */
+    display: inline-block; /* Allows the div to shrink-wrap the content */
+    font-size: 14px; /* Text size */
+    font-weight: bold; /* Bold text */
+  }
+    
