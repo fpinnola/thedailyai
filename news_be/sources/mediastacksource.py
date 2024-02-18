@@ -2,6 +2,7 @@ import requests
 import os
 from datetime import datetime, timedelta, time
 from article_extractor import get_article_info
+from article_model import ArticleModel
 
 ACCESS_KEY = os.getenv('MEDIASTACK_API_KEY', '')
 
@@ -42,8 +43,14 @@ def fetch_news(keywords=None, countries=None, categories=None, limit=100, offset
 def get_new_articles():
     response = fetch_news(categories="technology, business", limit=15, countries="us")
     articles = []
+
+    articleModel = ArticleModel(None)
+
     for article in response['data']:
         external_id = 'ms' + article['url']
+        if articleModel.does_article_with_external_id_exist(external_id):
+            print(f"external id already exists {external_id}")
+            continue
         article_info = get_article_info(article['url'])
         if not article_info or not ('date' in article_info) or not article_info['date']:
                 continue
