@@ -5,9 +5,12 @@ from article_extractor import get_article_info
 from article_model import ArticleModel
 
 
-def fetch_news(keywords=None, countries=None, categories=None, limit=100, offset=0, within_days=2):
+def fetch_news(keywords=None, countries='us', categories=None, limit=100, offset=0, within_days=2):
     base_url = "http://api.mediastack.com/v1/news"
     ACCESS_KEY = os.getenv('MEDIASTACK_API_KEY', '')
+
+    print(f"keywords: {keywords} categories: {categories}")
+    return []
 
     start_date = datetime.now() - timedelta(days=within_days)
     start_date_str = start_date.strftime('%Y-%m-%d')

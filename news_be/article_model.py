@@ -39,6 +39,11 @@ class ArticleModel:
         }, upsert=True)
 
         return new_article
+    
+    def save_list_articles(self, article_list):
+        result = self.articles.insert_many(article_list)
+        return result
+
 
     def get_articles_since(self, date):
         query = {"articleDate": {"$gte": date}}
