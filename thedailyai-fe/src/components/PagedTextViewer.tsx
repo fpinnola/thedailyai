@@ -1,12 +1,10 @@
-import { useState } from 'react';
-import ArrowRight from '../assets/ArrowRight.png';
-import ArrowLeft from '../assets/ArrowLeft.png';
+// import { useState } from 'react';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 
-
+import './customCarouselStyles.css';
 
 const PagedTextViewer = ({ text, charsPerPage = 500 }: { text: string, charsPerPage?: number }) => {
-  const [currentPage, setCurrentPage] = useState(0);
-
   // Function to split the text into pages
   const getTextPages = (text: string) => {
     let pages = [];
@@ -33,39 +31,30 @@ const PagedTextViewer = ({ text, charsPerPage = 500 }: { text: string, charsPerP
   };
 
   const pages = getTextPages(text);
-
-  // Navigation functions
-  const nextPage = () => setCurrentPage((prevPage) => Math.min(prevPage + 1, pages.length - 1));
-  const prevPage = () => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-
-  return (
-    <div>
-      <div style={{ whiteSpace: 'pre-wrap' }}>{pages[currentPage]}</div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-        {currentPage > 0 ? (
-          <button className='bubble-button' style={{
-            backgroundColor: 'transparent'
-          }} onClick={prevPage}>            
-          <img style={{
-            height: 24,
-            width: 24
-          }} src={ArrowLeft} />
-          </button>
-        ) : (
-          <div></div> // Empty div for spacing when there's no '<' button
-        )}
-        <div style={{ marginLeft: 'auto' }}> {/* This ensures '>' is always on the right */}
-          {currentPage < pages.length - 1 && <button className='bubble-button' style={{
-            backgroundColor: 'transparent'
-          }} onClick={nextPage}>
-            <img style={{
-              height: 24,
-              width: 24
-            }} src={ArrowRight} />
-            </button>}
-        </div>
+  if (pages.length === 1) {
+    return (
+      <div style={{padding: '10px'}}>
+        {pages[0]}
       </div>
-    </div>
+    )
+  }
+  return (
+    <Carousel
+      showArrows={false}
+      infiniteLoop={false}
+      showStatus={false}
+      showIndicators={true}
+      showThumbs={false}
+      swipeable={true}
+      emulateTouch={true}
+      preventMovementUntilSwipeScrollTolerance={true}
+    >
+      {pages.map((page, index) => (
+        <div key={index} style={{ whiteSpace: 'pre-wrap', padding: '10px', marginBottom: 20, height: 450 }}>
+          {page}
+        </div>
+      ))}
+    </Carousel>
   );
 };
 

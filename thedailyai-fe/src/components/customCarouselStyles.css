@@ -1,0 +1,11 @@
+/* customCarouselStyles.css */
+
+.selected {
+    background-color: transparent;
+}
+
+.carousel-container {
+    margin-bottom: 20px; /* Adjust accordingly */
+}
+
+/* You can also target other elements and states as needed */
