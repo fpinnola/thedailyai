@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { login, signupUser, updateUserPreferences } from "./external/news_be.external";
 import loading from "./assets/loading.gif"
 
-const newsCategories: string[] = ["economy", "business", "technology", "biotech", "healthcare", "politics", "law", "government", "crime", "weather"];
+const newsCategories: string[] = ["business", "technology", "politics", "healthcare", "legal", "science"];
 const summaryDetailOptions: string[] = ["High-Level Overview", "Moderately Detailed", "Very Detailed"];
 // const newsStyleOptions: string[] = ["Newscaster", "Humorous", "Serious", "Relaxed"];
 const PAGES = 3;
