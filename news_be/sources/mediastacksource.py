@@ -19,7 +19,8 @@ def fetch_news(keywords=None, countries=None, categories=None, limit=100, offset
         "access_key": ACCESS_KEY,
         "limit": limit,
         "date": f"{start_date_str},{today_str}",
-        "sort": "popularity"
+        "sort": "popularity",
+        "languages": "en"
     }
     
     # Conditionally add parameters if they are not None
