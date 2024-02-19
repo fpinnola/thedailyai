@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 from flask_cors import CORS
 from main import get_news_from_params, get_user_podcast, update_news_articles
+from aggregation_engine import init_pipeline
 from main import create_user, validate_user, update_user_prefs
 import os
 from datetime import timedelta
@@ -114,7 +115,7 @@ def handle_update_news():
     logging.info("Starting refresh of news")
     def update_with_context():
         with app.app_context():
-            update_news_articles()
+            init_pipeline()
     thread = Thread(target = update_with_context)
     thread.start()
     return "Began"
