@@ -4,6 +4,8 @@ import random
 import logging
 
 from dotenv import load_dotenv
+load_dotenv()
+
 from openai import OpenAI
 from eventregistry import *
 from user_model import UserModel
@@ -17,9 +19,10 @@ from article_model import ArticleModel
 from utils import is_within_n_hours
 from sources import mediastacksource
 
-
 # Load environment variables from .env
-load_dotenv()
+
+print(f"OPenAI key: {os.getenv('OPENAI_API_KEY')}")
+
 
 
 # Load env variables

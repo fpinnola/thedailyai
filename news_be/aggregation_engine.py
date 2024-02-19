@@ -4,6 +4,7 @@ from datetime import datetime, time
 from sources import mediastacksource
 from article_model import ArticleModel
 from article_extractor import get_article_info
+from emebddings import get_embedding
 
 
 QUERIES = [
@@ -41,6 +42,7 @@ def filter_format_articles(articles):
         article_info['date'] = datetime.combine(date_to_compare, time.min)
         article_info['url'] = a['url']
         article_info['externalId'] = external_id
+        article_info['body'] = article_info['raw_text']
         res_articles.append(article_info)
     
     return res_articles
@@ -48,14 +50,12 @@ def filter_format_articles(articles):
 # Generate vector embedding of each article, and add to article
 def add_vector_embeddings(article_list):
     for a in article_list:
-        # TODO: generate embedding
-        emb = []
-        a['embedding'] = emb
+        a['embedding'] = get_embedding(a['body'])
 
 def init_pipeline():
     articleModel = ArticleModel(None)
     for q in range(1):
-        query_result = mediastacksource.fetch_news(**QUERIES[q])
+        query_result = mediastacksource.fetch_news(**QUERIES[q], limit=5)
         article_list = query_result['data']
         if len(article_list) == 0:
             print(f"AE, No articles found for query {q}")
@@ -63,8 +63,6 @@ def init_pipeline():
         article_list = filter_format_articles(article_list)
         add_vector_embeddings(article_list)
         articleModel.save_list_articles(article_list)
-
-
 
 
 

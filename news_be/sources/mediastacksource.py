@@ -10,7 +10,7 @@ def fetch_news(keywords=None, countries='us', categories=None, limit=100, offset
     ACCESS_KEY = os.getenv('MEDIASTACK_API_KEY', '')
 
     print(f"keywords: {keywords} categories: {categories}")
-    return []
+    # return []
 
     start_date = datetime.now() - timedelta(days=within_days)
     start_date_str = start_date.strftime('%Y-%m-%d')
