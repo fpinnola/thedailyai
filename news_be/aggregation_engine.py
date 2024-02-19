@@ -1,5 +1,6 @@
 ## Aggregation Engine handles querying for and populating the database with news articles from the web 
 from datetime import datetime, time
+import uuid
 
 from sources import mediastacksource
 from article_model import ArticleModel
@@ -56,6 +57,7 @@ def add_vector_embeddings(article_list):
 # Reformats article to save in db
 def format_article_for_db(article_old):
     article = {}
+    article['articleId'] = str(uuid.uuid4())
     article['title'] = article_old['title']
     article['body'] = article_old['body']
     article['url'] = article_old['url']

@@ -135,7 +135,7 @@ def update_news_articles():
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("mediastack", datetime.now())
 
-def get_articles_from_hackernews(categories, n=10):
+def get_new_articles_fromdb(categories, n=10):
     print(f"Requesting {n} articles from hackernews")
     if not n or n <=0:
         # Requesting 0 articles
@@ -149,6 +149,12 @@ def get_articles_from_hackernews(categories, n=10):
     # Randomly select N elements from the list
     selected_elements = random.sample(response, N)
     print(N)
+    for a in selected_elements:
+        # Generate summary
+        if ('summary' not in a):
+            summarize_article(a)
+            articles.save_article(a['articleId'], a['title'], a['body'], a['summary'], a['url'], a['category'], a['articleDate'], a['externalId'])
+        
     return selected_elements
 
 def create_user(username, password):
@@ -301,7 +307,7 @@ def get_news_from_params(params, n=10):
 
     # Query API for missing articles
     n = n - len(articles)
-    new_articles = get_articles_from_hackernews(categories, n)
+    new_articles = get_new_articles_fromdb(categories, n)
 
     temp_articles = []
     for article in new_articles:

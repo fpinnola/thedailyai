@@ -1,4 +1,5 @@
 from datetime import datetime
+from pymongo import UpdateOne
 
 def is_same_day_as_today(date_to_check):
     # Get today's date
@@ -41,7 +42,17 @@ class ArticleModel:
         return new_article
     
     def save_list_articles(self, article_list):
-        result = self.articles.insert_many(article_list)
+
+        bulk_ops = [
+            UpdateOne(
+                {"articleId": article["articleId"]},  # Query part: matches document by unique identifier
+                {"$set": article},  # Update part: sets new values from `article`
+                upsert=True  # Option to insert the document if it does not exist
+            )
+            for article in article_list
+        ]       
+
+        result = self.articles.bulk_write(bulk_ops)
         return result
 
 
