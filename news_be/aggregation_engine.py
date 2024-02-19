@@ -52,19 +52,34 @@ def add_vector_embeddings(article_list):
     for a in article_list:
         a['embedding'] = get_embedding(a['body'])
 
+
+# Reformats article to save in db
+def format_article_for_db(article_old):
+    article = {}
+    article['title'] = article_old['title']
+    article['body'] = article_old['body']
+    article['url'] = article_old['url']
+    article['articleDate'] = article_old['date']
+    article['externalId'] = article_old['externalId']
+    article['embedding'] = article_old['embedding']
+    return article
+
+
 def init_pipeline():
     articleModel = ArticleModel(None)
-    for q in range(1):
-        query_result = mediastacksource.fetch_news(**QUERIES[q], limit=5)
+    for q in QUERIES:
+        query_result = mediastacksource.fetch_news(**q, limit=25)
         article_list = query_result['data']
         if len(article_list) == 0:
             print(f"AE, No articles found for query {q}")
             continue
         article_list = filter_format_articles(article_list)
         add_vector_embeddings(article_list)
+        article_list = [format_article_for_db(a) for a in article_list]
         articleModel.save_list_articles(article_list)
 
-
+def test():
+    init_pipeline()
 
 
 if __name__ == "__main__":

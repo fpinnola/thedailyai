@@ -349,6 +349,9 @@ def get_user_podcast(params):
 
 
 if __name__ == "__main__":
+    from aggregation_engine import test
+    test()
+
     # print(res)
 
     # article_body = "TOKYO -- Japan will establish a new visa status that will make it easier for IT engineers and other workers for overseas companies to reside in the country, the Immigration Services Agency said Friday. The planned status will allow highly skilled workers to work in Japan on a teleworking basis for up to six months while enjoying sightseeing trips, the agency said."

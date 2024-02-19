@@ -1,5 +1,7 @@
 import requests
 import os
+import logging
+
 from datetime import datetime, timedelta, time
 from article_extractor import get_article_info
 from article_model import ArticleModel
@@ -9,8 +11,7 @@ def fetch_news(keywords=None, countries='us', categories=None, limit=100, offset
     base_url = "http://api.mediastack.com/v1/news"
     ACCESS_KEY = os.getenv('MEDIASTACK_API_KEY', '')
 
-    print(f"keywords: {keywords} categories: {categories}")
-    # return []
+    logging.debug(f"keywords: {keywords} categories: {categories}")
 
     start_date = datetime.now() - timedelta(days=within_days)
     start_date_str = start_date.strftime('%Y-%m-%d')
