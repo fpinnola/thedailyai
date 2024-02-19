@@ -10,22 +10,32 @@ from emebddings import get_embedding
 
 QUERIES = [
     { 
-        'categories': 'technology, business',
+        'params': {
+            'categories': 'technology, business',
+        },
         'category_label': "technology",
     },
     {
-        'categories': 'technology, business',
-        'keywords': 'legal law court',
+        'params': {
+            'categories': 'technology, business',
+            'keywords': 'legal law court'
+        },
         'category_label': "legal",
 
     },
     {
-        'categories': 'technology, business',
-        'keywords': 'healthcare',
+        'params': {
+            'categories': 'technology, business',
+            'keywords': 'healthcare'
+        },
+        'category_label': 'healthcare'
+
     },
     {
-        'categories': 'general',
-        'keywords': 'politics republican democrat',
+        'params': {
+            'categories': 'general',
+            'keywords': 'politics republican democrat',
+        },
         'category_label': "politics",
     }
 ]
@@ -76,7 +86,7 @@ def format_article_for_db(article_old, category=None):
 def init_pipeline():
     articleModel = ArticleModel(None)
     for q in QUERIES:
-        query_result = mediastacksource.fetch_news(**q, limit=25)
+        query_result = mediastacksource.fetch_news(**q['params'], limit=25)
         article_list = query_result['data']
         if len(article_list) == 0:
             print(f"AE, No articles found for query {q}")

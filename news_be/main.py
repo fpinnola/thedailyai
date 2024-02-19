@@ -135,7 +135,7 @@ def update_news_articles():
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("mediastack", datetime.now())
 
-def get_new_articles_fromdb(categories, n=10):
+def get_new_articles_fromdb(categories=[], n=10):
     print(f"Requesting {n} articles from hackernews")
     if not n or n <=0:
         # Requesting 0 articles
@@ -143,7 +143,11 @@ def get_new_articles_fromdb(categories, n=10):
     
     # Query Articles DB for relevant articles
     twenty_four_hours_ago = datetime.now() - timedelta(days=5)
-    response = articles.get_articles_since(twenty_four_hours_ago)
+    response = []
+    if (len(categories) > 0):
+        response = articles.get_articles_category_since(categories, twenty_four_hours_ago)
+    else:
+        response = articles.get_articles_since(twenty_four_hours_ago)
 
     N = min(n, len(response))
     # Randomly select N elements from the list

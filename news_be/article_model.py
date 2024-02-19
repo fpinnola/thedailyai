@@ -69,7 +69,7 @@ class ArticleModel:
             "category": { "$in": categories }
                 }
         
-        return self.articles.find(query)
+        return list(self.articles.find(query))
     
     def does_article_with_external_id_exist(self, external_id):
         query = {'externalId': external_id}
