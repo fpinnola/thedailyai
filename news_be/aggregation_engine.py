@@ -11,18 +11,22 @@ from emebddings import get_embedding
 QUERIES = [
     { 
         'categories': 'technology, business',
+        'category_label': "technology",
     },
     {
         'categories': 'technology, business',
-        'keywords': 'legal law court'
+        'keywords': 'legal law court',
+        'category_label': "legal",
+
     },
     {
         'categories': 'technology, business',
-        'keywords': 'healthcare'
+        'keywords': 'healthcare',
     },
     {
         'categories': 'general',
-        'keywords': 'politics republican democrat'
+        'keywords': 'politics republican democrat',
+        'category_label': "politics",
     }
 ]
 
@@ -55,7 +59,7 @@ def add_vector_embeddings(article_list):
 
 
 # Reformats article to save in db
-def format_article_for_db(article_old):
+def format_article_for_db(article_old, category=None):
     article = {}
     article['articleId'] = str(uuid.uuid4())
     article['title'] = article_old['title']
@@ -64,6 +68,8 @@ def format_article_for_db(article_old):
     article['articleDate'] = article_old['date']
     article['externalId'] = article_old['externalId']
     article['embedding'] = article_old['embedding']
+    if category is not None:
+        article['category'] = category
     return article
 
 
@@ -77,7 +83,7 @@ def init_pipeline():
             continue
         article_list = filter_format_articles(article_list)
         add_vector_embeddings(article_list)
-        article_list = [format_article_for_db(a) for a in article_list]
+        article_list = [format_article_for_db(a, q['category_label']) for a in article_list]
         articleModel.save_list_articles(article_list)
 
 def test():

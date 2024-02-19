@@ -246,7 +246,8 @@ def summarize_article(article):
         obj = json.loads(response)
 
         article['summary'] = obj['summary']
-        article['category'] = obj['category']
+        if ('category' not in article):
+            article['category'] = obj['category']
     except Exception as e:
         print("Error in summarizing article:", str(e))
 
