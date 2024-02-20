@@ -3,8 +3,35 @@ import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 
 import './customCarouselStyles.css';
+import { useEffect, useState } from 'react';
 
-const PagedTextViewer = ({ text, charsPerPage = 500 }: { text: string, charsPerPage?: number }) => {
+const PagedTextViewer = ({ text, defaultCharsPerPage = 500 }: { text: string, defaultCharsPerPage?: number }) => {
+  const [charsPerPage, setCharsPerPage] = useState(defaultCharsPerPage);
+
+  // Adjust charsPerPage based on screen width
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      // For example, if screen width is more than 768px, we assume it's a desktop
+      if (screenWidth > 500) {
+        // Set a larger charsPerPage for desktop
+        setCharsPerPage(1500); // Adjust this value as needed
+      } else {
+        // Set the default (smaller) charsPerPage for mobile
+        setCharsPerPage(defaultCharsPerPage);
+      }
+    };
+
+    // Set the initial size on mount
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, [defaultCharsPerPage]);
+
   // Function to split the text into pages
   const getTextPages = (text: string) => {
     let pages = [];

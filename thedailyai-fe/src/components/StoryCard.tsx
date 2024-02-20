@@ -29,7 +29,7 @@ const StoryCard = ({ title, summary, url, category, dateString, articleId }: { t
             }}>
                 <h4 style={{ marginBottom: 5}}>{title}</h4>
                 <h5 style={{ marginTop: 2 }}>{formatDate(dateString)}</h5>
-                <PagedTextViewer text={summary} charsPerPage={700} />
+                <PagedTextViewer text={summary} defaultCharsPerPage={600} />
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row',
