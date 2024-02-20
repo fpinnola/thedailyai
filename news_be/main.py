@@ -291,8 +291,17 @@ def is_article_in_list(article, articles):
 
 def get_news_from_params(params, n=10):
 
-    categories = params['categories']
+    categories = []
     userId = params['userId']
+    user = users.get_user(userId)
+
+    if not user:
+        print(f"User not found {userId}")
+        return []
+    
+    if 'categories' in user['preferences']:
+        categories = user['preferences']['categories']
+
 
     if not categories or not userId:
         print("Error getting params from get news request")
