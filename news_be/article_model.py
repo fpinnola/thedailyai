@@ -51,7 +51,9 @@ class ArticleModel:
             )
             for article in article_list
         ]       
-
+        if len(bulk_ops) == 0:
+            return None
+        
         result = self.articles.bulk_write(bulk_ops)
         return result
 

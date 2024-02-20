@@ -40,15 +40,36 @@ QUERIES = [
     }
 ]
 
+BLOCK_SOURCES = ['Business Line', 'Zee Business']
+
+BLOCK_URLS = ['ndtvprofit', 'hindu']
+
+def article_is_ok(article):
+    articleModel = ArticleModel(None)
+
+    external_id = 'ms' + article['url']
+    if articleModel.does_article_with_external_id_exist(external_id):
+        print(f"external id already exists {external_id}")
+        return False
+
+    if article['source'] in BLOCK_SOURCES:
+        return False
+    
+    for b in BLOCK_URLS:
+        if b in article['url']:
+            return False
+
+    return True
+    
 # Filter out articles already in DB
 # Extract data on article using scraping tool
 def filter_format_articles(articles):
-    articleModel = ArticleModel(None)
     res_articles = []
     for a in articles:
         external_id = 'ms' + a['url']
-        if articleModel.does_article_with_external_id_exist(external_id):
-            print(f"external id already exists {external_id}")
+        if not article_is_ok(a):
+            print(f"Article skipped {a['url']}")
+            # print(f"external id already exists {external_id}")
             continue
         article_info = get_article_info(a['url'])
         if not article_info or not ('date' in article_info) or not article_info['date']:
@@ -86,7 +107,7 @@ def format_article_for_db(article_old, category=None):
 def init_pipeline():
     articleModel = ArticleModel(None)
     for q in QUERIES:
-        query_result = mediastacksource.fetch_news(**q['params'], limit=25)
+        query_result = mediastacksource.fetch_news(**q['params'], limit=100)
         article_list = query_result['data']
         if len(article_list) == 0:
             print(f"AE, No articles found for query {q}")
