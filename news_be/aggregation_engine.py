@@ -11,7 +11,7 @@ from emebddings import get_embedding
 QUERIES = [
     { 
         'params': {
-            'categories': 'technology, business',
+            'categories': 'technology',
         },
         'category_label': "technology",
     },
@@ -25,7 +25,7 @@ QUERIES = [
     },
     {
         'params': {
-            'categories': 'technology, business',
+            'categories': 'technology, business, general',
             'keywords': 'healthcare'
         },
         'category_label': 'healthcare'
@@ -33,10 +33,10 @@ QUERIES = [
     },
     {
         'params': {
-            'categories': 'general',
-            'keywords': 'politics republican democrat',
+            'categories': 'business',
+            'keywords': 'US',
         },
-        'category_label': "politics",
+        'category_label': "business",
     }
 ]
 
