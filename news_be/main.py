@@ -134,7 +134,7 @@ def update_news_articles():
         scrape_sources.update_since_scrape("mediastack", datetime.now())
 
 def get_new_articles_fromdb(categories=[], n=10):
-    print(f"Requesting {n} articles from hackernews")
+    print(f"Requesting {n} articles, with categories {categories}")
     if not n or n <=0:
         # Requesting 0 articles
         return []
@@ -307,7 +307,7 @@ def get_news_from_params(params, n=10):
         print("Error getting params from get news request")
         return []
 
-    print(f"params: {params['categories']}")
+    print(f"categories: {categories}")
     print(f"userId: {params['userId']}")
 
     articles = []
@@ -315,7 +315,7 @@ def get_news_from_params(params, n=10):
     user_artices = users.get_user_articles(userId)
     if user_artices is None:
         # User doesn't exist, create
-        users.save_user_preferences(userId, {})
+        # users.save_user_preferences(userId, {})
         user_artices = []
 
     articles.extend(user_artices)
