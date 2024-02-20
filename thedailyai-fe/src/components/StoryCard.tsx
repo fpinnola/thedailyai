@@ -1,16 +1,20 @@
+import { addUserEngagement } from "../external/news_be.external";
 import CategoryLabel from "./CategoryLabel";
 import PagedTextViewer from "./PagedTextViewer";
-// import bookmarkFilled from '../assets/bookmark-filled.png'
-// import bookmarkEmpty from '../assets/bookmark-empty.png'
 
 
-const StoryCard = ({ title, summary, url, category, dateString }: { title: string, summary: string, url: string, category: string, dateString: string } ) => {
+
+const StoryCard = ({ title, summary, url, category, dateString, articleId }: { title: string, summary: string, url: string, category: string, dateString: string, articleId: string } ) => {
 
     function formatDate(dateString: string) {
         const date = new Date(dateString);
         const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: '2-digit' };
         if (!options) return '';
         return new Intl.DateTimeFormat('en-US', options).format(date);
+    }
+
+    function handleAction(action: string) {
+        addUserEngagement(articleId, action);
     }
 
     return (
@@ -33,7 +37,7 @@ const StoryCard = ({ title, summary, url, category, dateString }: { title: strin
                     alignItems: 'center'
                 }}>
                     <CategoryLabel label={category} />
-                    <a target="_blank" href={url}>Goto source</a>
+                    <a target="_blank" onClick={() => handleAction("goto-source")} href={url}>Goto source</a>
                 </div>
             </div>
         </div>

@@ -92,6 +92,33 @@ export async function updateUserPreferences(preferences: any): Promise<object> {
     })
 }
 
+export async function addUserEngagement(articleId: string, action: string): Promise<object> {
+    let reqURL = baseURL + '/user/action';
+    // console.log(`preferences: ${JSON.stringify(preferences)}`);
+
+    return new Promise((resolve, reject) => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            // TODO: Send user to login!
+            console.log(`Error: user token no longer valid`);
+            reject("failed");
+            return;
+        }
+        axios.post(reqURL, {
+            articleId: articleId,
+            action: action
+        }, {headers: { Authorization: `Bearer ${JSON.parse(token)}` }})
+        .then((res) => {
+            console.log(`Received data: ${JSON.stringify(res.data)}`)
+            resolve(res.data);
+        })
+        .catch((err) => {
+            console.log(`Error getting podcast: ${JSON.stringify(err)}`);
+            reject(err);
+        });
+    })
+}
+
 export async function login(email: string, password: string): Promise<object> {
     let reqURL = baseURL + '/login';
     // console.log(`preferences: ${JSON.stringify(preferences)}`);

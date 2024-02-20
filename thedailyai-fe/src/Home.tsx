@@ -103,7 +103,7 @@ export default function Home() {
                 <div className="slider-container">
                     {articles.map((elem, index) => {
                         return (
-                        <StoryCard key={elem.title + index} title={elem.title} summary={elem.summary} url={elem.url} category={elem.category} dateString={elem.articleDate} />
+                        <StoryCard key={elem.title + index} title={elem.title} summary={elem.summary} url={elem.url} category={elem.category} dateString={elem.articleDate} articleId={elem.articleId} />
                     )} )}
                 </div>
             )}
