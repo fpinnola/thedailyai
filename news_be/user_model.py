@@ -169,22 +169,37 @@ class UserModel:
             return ''
         
         return user['dailyAudioURL']
+    
+    def add_engagement(self, userId, articleId, action):
+        
+        try:
+            user = self.users.find_one({'userId': userId})
+            if user:
+                engagement_found = False
+                if 'engagements' in user:
+                    for engagement in user['engagements']:
+                        if engagement['articleId'] == articleId:
+                            # Engagement found, add action if not already present
+                            self.users.update_one(
+                                {'userId': userId, 'engagements.articleId': articleId},
+                                {'$push': {'engagements.$.actions': action}}
+                            )
+                            engagement_found = True
+                            break
+                    
+                if not engagement_found:
+                    # Add new engagement
+                    new_engagement = {'articleId': articleId, 'actions': [action]}
+                    self.users.update_one(
+                        {'userId': userId},
+                        {'$push': {'engagements': new_engagement}},
+                        upsert=True  # This creates the document if it doesn't exist
+                    )
+                return {"message": "success"}
+            else:
+                print(f"User with id {userId} not found.")
+                return {"error": "User not found"}
 
+        except Exception as e:
+            return {"error": f"Error: {e}"}
 
-if __name__ == '__main__':
-    users = UserModel()
-
-    print(users.get_user('abc123'))
-
-    preferences = {
-        'categories': ['biotech', 'tech']
-    }
-
-    users.save_user_preferences('abc123', preferences)
-
-    print(users.get_user('abc123'))
-
-    articles = ['abc123', 'article2!']
-    users.update_user_articles('abc123', articles)
-
-    print(users.get_user_articles('abc123'))

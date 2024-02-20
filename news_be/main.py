@@ -21,8 +21,6 @@ from sources import mediastacksource
 
 # Load environment variables from .env
 
-print(f"OPenAI key: {os.getenv('OPENAI_API_KEY')}")
-
 
 
 # Load env variables
@@ -169,6 +167,9 @@ def validate_user(username, password):
 
 def update_user_prefs(userId, prefs):
     return users.save_user_preferences(userId, prefs)
+
+def add_user_engagement(userId, articleId, action):
+    return users.add_engagement(userId, articleId, action)
 
 '''
     Returns n latest articles given categories

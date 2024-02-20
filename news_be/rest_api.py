@@ -6,7 +6,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from main import get_news_from_params, get_user_podcast, update_news_articles
 from aggregation_engine import init_pipeline
-from main import create_user, validate_user, update_user_prefs
+from main import create_user, validate_user, update_user_prefs, add_user_engagement
 import os
 from datetime import timedelta
 
@@ -78,6 +78,20 @@ def handle_update_user_prefs():
     if 'error' in res:
         return jsonify(res), 401
 
+    return jsonify(res), 200
+
+@app.route('/user/action', methods=['POST'])
+@jwt_required()
+def handle_user_engagement():
+    data = request.json
+    action = data.get('action')
+    articleId = data.get('articleId')
+    current_user = get_jwt_identity()
+
+    res = add_user_engagement(current_user, articleId, action)
+    if 'error' in res:
+        return jsonify(res), 401
+    
     return jsonify(res), 200
 
 @app.route('/getNews', methods=['POST'])
