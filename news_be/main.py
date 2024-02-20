@@ -171,40 +171,7 @@ def update_user_prefs(userId, prefs):
 def add_user_engagement(userId, articleId, action):
     return users.add_engagement(userId, articleId, action)
 
-'''
-    Returns n latest articles given categories
-    Params:
-        categories: list of strings
-        n: max articles to return (default 5)
-'''
-# def get_articles_from_api(categories, n=10):
-#     print(f"Requesting {n} articles from external API")
-#     if not n:
-#         # Requesting 0 articles
-#         return []
 
-#     ri = ReturnInfo(ArticleInfoFlags(categories=True))
-
-#     q = QueryArticlesIter(
-#         categoryUri= QueryItems.OR([f"{er.getCategoryUri(cat)}" for cat in categories]),
-#         lang='eng',
-#         startSourceRankPercentile=0,
-#         endSourceRankPercentile=10,
-#         dataType="news"
-#     )
-
-#     articles = []
-#     for art in q.execQuery(er, sortBy = "date", maxItems=n, returnInfo=ri):
-#         articles.append({
-#             'title': art['title'],
-#             'body': art['body'],
-#             'uri': art['uri'],
-#             'meta': {k: v for k, v in art.items() if k not in ['body', 'title', 'url']}
-#         })
-    
-#     return articles
-
-    
 '''
     Returns a finalized script for a news broadcast given a set of articles
     Params:
@@ -365,21 +332,3 @@ def get_user_podcast(params):
 
     return audio_url
 
-
-
-
-
-if __name__ == "__main__":
-    from aggregation_engine import test
-    test()
-
-    # print(res)
-
-    # article_body = "TOKYO -- Japan will establish a new visa status that will make it easier for IT engineers and other workers for overseas companies to reside in the country, the Immigration Services Agency said Friday. The planned status will allow highly skilled workers to work in Japan on a teleworking basis for up to six months while enjoying sightseeing trips, the agency said."
-    # article = {
-    #     'body': article_body
-    # }
-    # summary = summarize_article(article)
-    # print(article)
- 
-    pass
