@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, signupUser, updateUserPreferences } from "./external/news_be.external";
-import loading from "./assets/loading.gif"
 
 const newsCategories: string[] = ["business", "technology", "politics", "healthcare", "legal", "science"];
 const summaryDetailOptions: string[] = ["High-Level Overview", "Moderately Detailed", "Very Detailed"];
@@ -99,10 +98,7 @@ export default function Onboard() {
 
                     <div>
                         {isLoading && (
-                            <img style={{
-                                height: 24, 
-                                width: 24
-                            }} src={loading} alt="Loading..." />
+                            <span className="loading loading-spinner loading-lg"></span>
                         )}
                         <form className="signup-form-container" onSubmit={handleSignup}>
                             <div className="signup-input-container">

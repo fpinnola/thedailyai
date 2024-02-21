@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getNews } from "./external/news_be.external";
 import StoryCard from "./components/StoryCard";
-import loading from "./assets/loading.gif"
 import { useNavigate } from "react-router-dom";
 
 const USER_ID_TEST = 'frank123';
@@ -91,10 +90,7 @@ export default function Home() {
                     alignItems: 'center',
                     flexDirection: 'column'
                 }}>
-                <img style={{
-                    height: 24, 
-                    width: 24
-                }} src={loading} alt="Loading..." />
+                <span className="loading loading-spinner loading-lg"></span>
                 <h3>{loadingMessage}</h3>
                 </div>
 
