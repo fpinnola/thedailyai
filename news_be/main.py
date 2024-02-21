@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, date
 from pymongo import MongoClient
 from sources_model import SourcesModel
 from article_model import ArticleModel
+import numpy as np
 
 from utils import is_within_n_hours
 from sources import mediastacksource
@@ -147,17 +148,7 @@ def get_new_articles_fromdb(categories=[], n=10):
     else:
         response = articles.get_articles_since(twenty_four_hours_ago)
 
-    N = min(n, len(response))
-    # Randomly select N elements from the list
-    selected_elements = random.sample(response, N)
-    print(N)
-    for a in selected_elements:
-        # Generate summary
-        if ('summary' not in a):
-            summarize_article(a)
-            articles.save_article(a['articleId'], a['title'], a['body'], a['summary'], a['url'], a['category'], a['articleDate'], a['externalId'])
-        
-    return selected_elements
+    return response
 
 def create_user(username, password):
     return users.create_user(username, password)
@@ -256,11 +247,81 @@ def is_article_in_list(article, articles):
             return True
     return False
 
+def cosine_similarity(vec1, vec2):
+    dot_product = np.dot(vec1, vec2)
+    norm_vec1 = np.linalg.norm(vec1)
+    norm_vec2 = np.linalg.norm(vec2)
+    similarity = dot_product / (norm_vec1 * norm_vec2)
+    return similarity
+
+
+def action_weight(action):
+    if action == "goto-source":
+        return 0.3
+    if action == "thumbs-up":
+        return 0.5
+    if action == "thumbs-down":
+        return -0.5
+    
+
+def generate_article_score(user_engagements, article):
+    num_engagements = len(user_engagements)
+    if 'embedding' not in article:
+        article['user_score'] = 0.5
+        return
+    
+    total_score = 0.0
+    
+    for e_a in user_engagements:
+        # print(f"e: {e_a}")
+        # e_a = articles.get_article(e['articleId'])
+        if 'embedding' not in e_a or e_a['embedding'] is None:
+            continue
+        weighted_score = 0
+        if 'embedding' not in e_a:
+            print(f"No embedding found for article: {e['articleId']}")
+        e_a_emb = np.array(e_a['embedding'])
+        similarity = cosine_similarity(np.array(article['embedding']), e_a_emb)
+        for action in e_a['actions']:
+            weighted_score += similarity * action_weight(action)
+        total_score += weighted_score
+    
+    article['user_score'] = total_score / num_engagements
+
+
+    
+def populate_embedding_in_engagement(user_engagement):
+    e_a = articles.get_article(user_engagement['articleId'])
+    if e_a is None:
+        return
+    user_engagement['embedding'] = e_a['embedding']
+
+def get_top_n_articles(articles, n):
+    """
+    Returns the top N articles by 'user_score'.
+    
+    Parameters:
+    - articles: A list of dictionaries, where each dictionary represents an article
+      and has at least a 'user_score' key.
+    - n: The number of top articles to return.
+    
+    Returns:
+    - A list of the top N articles sorted by 'user_score' in descending order.
+    """
+    # Sort the articles by 'user_score' in descending order
+    sorted_articles = sorted(articles, key=lambda x: x['user_score'], reverse=True)
+    
+    # Return the top N articles, or all articles if there are less than N
+    return sorted_articles[:n]
+
 def get_news_from_params(params, n=10):
 
     categories = []
     userId = params['userId']
     user = users.get_user(userId)
+    engagements = []
+    if 'engagements' in user and len(user['engagements']) > 2:
+        engagements = user['engagements']
 
     if not user:
         print(f"User not found {userId}")
@@ -287,19 +348,36 @@ def get_news_from_params(params, n=10):
 
     articles.extend(user_artices)
 
-    # Query API for missing articles
-    n = n - len(articles)
-    new_articles = get_new_articles_fromdb(categories, n)
+    n = n - len(articles) # How many articles needed
 
-    temp_articles = []
-    for article in new_articles:
-        if not is_article_in_list(article, articles):
-            temp_articles.append(article)
+    if n > 0:
+        # Get new candidate articles from db
+        new_article_candidates = get_new_articles_fromdb(categories, 100)
 
-    articles.extend(temp_articles)
+        # Add vector embeddings to user engagements (SPEEDUP attempt)
+        for e in engagements:
+            populate_embedding_in_engagement(e)
+
+        # Generate scores for each article
+        for a in new_article_candidates:
+            generate_article_score(engagements, a)
+
+        top_articles = get_top_n_articles(new_article_candidates, 5)
+
+        for a in top_articles:
+            # Generate summary
+            if 'summary' not in a:
+                summarize_article(a)
+                articles.save_article(a['articleId'], a['title'], a['body'], a['summary'], a['url'], a['category'], a['articleDate'], a['externalId'])
+        
+        temp_articles = []
+        for article in top_articles:
+            if not is_article_in_list(article, articles):
+                temp_articles.append(article)
+
+        articles.extend(temp_articles)
 
 
-    # TODO: Store articles in DB
     if (n > 0):
         users.update_user_articles(userId, articles)
 
@@ -332,3 +410,7 @@ def get_user_podcast(params):
 
     return audio_url
 
+
+
+if __name__ == "__main__":
+    get_news_from_params({'userId': 'fpinnola@stevens.edu'})
