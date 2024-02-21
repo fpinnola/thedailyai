@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { login } from "./external/news_be.external";
 import { useNavigate } from "react-router-dom";
-import loading from "./assets/loading.gif"
 
 export default function Login() {
     const navigate = useNavigate();
