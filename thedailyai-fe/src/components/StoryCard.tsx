@@ -2,9 +2,18 @@ import { addUserEngagement } from "../external/news_be.external";
 import CategoryLabel from "./CategoryLabel";
 import PagedTextViewer from "./PagedTextViewer";
 
+import ThumbsUpEmpty from '../assets/thumbs-up-empty.png';
+import ThumbsUpFilled from '../assets/thumbs-up-filled.png';
+import ThumbsDownEmpty from '../assets/thumbs-down-empty.png';
+import ThumbsDownFilled from '../assets/thumbs-down-filled.png';
+import { useState } from "react";
+import ImageButton from "./ImageButton";
 
 
 const StoryCard = ({ title, summary, url, category, dateString, articleId }: { title: string, summary: string, url: string, category: string, dateString: string, articleId: string } ) => {
+
+    const [thumbsUpSelected, setThumbsUpSelected] = useState(false);
+    const [thumbsDownSelected, setThumbsDownSelected] = useState(false);
 
     function formatDate(dateString: string) {
         const date = new Date(dateString);
@@ -15,6 +24,26 @@ const StoryCard = ({ title, summary, url, category, dateString, articleId }: { t
 
     function handleAction(action: string) {
         addUserEngagement(articleId, action);
+    }
+
+    function toggleRating(thumbsUp: boolean) {
+        if (thumbsUp) {
+            if (thumbsUpSelected) {
+                setThumbsUpSelected(false);
+            } else {
+                setThumbsUpSelected(true);
+                setThumbsDownSelected(false);
+                handleAction("thumbs-up");
+            }
+        } else {
+            if (thumbsDownSelected) {
+                setThumbsDownSelected(false);
+            } else {
+                setThumbsDownSelected(true);
+                setThumbsUpSelected(false);
+                handleAction("thumbs-down");
+            }
+        }
     }
 
     return (
@@ -36,6 +65,12 @@ const StoryCard = ({ title, summary, url, category, dateString, articleId }: { t
                     gap: 15,
                     alignItems: 'center'
                 }}>
+                    {thumbsUpSelected ? (
+                    <ImageButton imageSize={{height: 24, width: 24}} onClick={() => toggleRating(true)} image={ThumbsUpFilled} />) :
+                    (<ImageButton imageSize={{height: 24, width: 24}} onClick={() => toggleRating(true)} image={ThumbsUpEmpty} />)}
+                    {thumbsDownSelected ? (
+                    <ImageButton imageSize={{height: 24, width: 24}} onClick={() => toggleRating(false)} image={ThumbsDownFilled} />) :
+                    (<ImageButton imageSize={{height: 24, width: 24}} onClick={() => toggleRating(false)} image={ThumbsDownEmpty} />)}
                     <CategoryLabel label={category} />
                     <a target="_blank" onClick={() => handleAction("goto-source")} href={url}>Goto source</a>
                 </div>
