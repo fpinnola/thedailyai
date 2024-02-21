@@ -36,7 +36,7 @@ MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 client = OpenAI()
 db_client = MongoClient(f"mongodb+srv://fpinnola:{MONGO_PASSWORD}@cluster0.9bnvnxh.mongodb.net/?retryWrites=true&w=majority", 27017)
 users = UserModel(db_client)
-articles = ArticleModel(db_client)
+articlesModel = ArticleModel(db_client)
 scrape_sources = SourcesModel(db_client)
 
 THEMES =["business", "technology", "politics", "biotech"]
@@ -108,7 +108,7 @@ def update_news_articles():
             if (not 'summary' in article) or (not 'category' in article):
                 print(f"Issue getting summary or cateogry for article {article['title']}")
                 continue
-            articles.save_article(article_id, article['title'], article['raw_text'], article['summary'], article['url'], article['category'], article['date'], article['externalId'])
+            articlesModel.save_article(article_id, article['title'], article['raw_text'], article['summary'], article['url'], article['category'], article['date'], article['externalId'])
 
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("hackernews", datetime.now())
@@ -129,7 +129,7 @@ def update_news_articles():
             if (not 'summary' in article) or (not 'category' in article):
                 print(f"Issue getting summary or cateogry for article {article['title']}")
                 continue
-            articles.save_article(article_id, article['title'], article['raw_text'], article['summary'], article['url'], article['category'], article['date'], article['externalId'])
+            articlesModel.save_article(article_id, article['title'], article['raw_text'], article['summary'], article['url'], article['category'], article['date'], article['externalId'])
 
         # Update scrape sources to prevent future scrapes
         scrape_sources.update_since_scrape("mediastack", datetime.now())
@@ -144,9 +144,9 @@ def get_new_articles_fromdb(categories=[], n=10):
     twenty_four_hours_ago = datetime.now() - timedelta(days=5)
     response = []
     if (len(categories) > 0):
-        response = articles.get_articles_category_since(categories, twenty_four_hours_ago)
+        response = articlesModel.get_articles_category_since(categories, twenty_four_hours_ago)
     else:
-        response = articles.get_articles_since(twenty_four_hours_ago)
+        response = articlesModel.get_articles_since(twenty_four_hours_ago)
 
     return response
 
@@ -291,7 +291,7 @@ def generate_article_score(user_engagements, article):
 
     
 def populate_embedding_in_engagement(user_engagement):
-    e_a = articles.get_article(user_engagement['articleId'])
+    e_a = articlesModel.get_article(user_engagement['articleId'])
     if e_a is None:
         return
     user_engagement['embedding'] = e_a['embedding']
@@ -338,7 +338,7 @@ def get_news_from_params(params, n=10):
     print(f"categories: {categories}")
     print(f"userId: {params['userId']}")
 
-    articles = []
+    user_new_articles = []
 
     user_artices = users.get_user_articles(userId)
     if user_artices is None:
@@ -346,9 +346,9 @@ def get_news_from_params(params, n=10):
         # users.save_user_preferences(userId, {})
         user_artices = []
 
-    articles.extend(user_artices)
+    user_new_articles.extend(user_artices)
 
-    n = n - len(articles) # How many articles needed
+    n = n - len(user_new_articles) # How many articles needed
 
     if n > 0:
         # Get new candidate articles from db
@@ -362,28 +362,28 @@ def get_news_from_params(params, n=10):
         for a in new_article_candidates:
             generate_article_score(engagements, a)
 
-        top_articles = get_top_n_articles(new_article_candidates, 5)
+        top_articles = get_top_n_articles(new_article_candidates, n)
 
         for a in top_articles:
             # Generate summary
             if 'summary' not in a:
                 summarize_article(a)
-                articles.save_article(a['articleId'], a['title'], a['body'], a['summary'], a['url'], a['category'], a['articleDate'], a['externalId'])
+                articlesModel.save_article(a['articleId'], a['title'], a['body'], a['summary'], a['url'], a['category'], a['articleDate'], a['externalId'])
         
         temp_articles = []
         for article in top_articles:
-            if not is_article_in_list(article, articles):
+            if not is_article_in_list(article, user_new_articles):
                 temp_articles.append(article)
 
-        articles.extend(temp_articles)
+        user_new_articles.extend(temp_articles)
 
 
     if (n > 0):
-        users.update_user_articles(userId, articles)
+        users.update_user_articles(userId, user_new_articles)
 
-    print(f"articles {str(articles)[:500] + '...' if len(str(articles)) > 500 else str(articles)}")
+    print(f"articles {str(user_new_articles)[:500] + '...' if len(str(user_new_articles)) > 500 else str(user_new_articles)}")
 
-    return parse_json(articles)
+    return parse_json(user_new_articles)
 
 def get_user_podcast(params):
 
